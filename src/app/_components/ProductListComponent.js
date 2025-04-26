@@ -14,6 +14,12 @@ export default function ProductListComponent({ id }) {
     const router = useRouter()
     const [productid, setProductId] = useState('')
     const [list, setList] = useState([])
+    const [categoryfilterlist, setCategoryfilterlist] = useState([])
+    const [sizefilterlist, setSizefilterlist] = useState([])
+    const [colorfilterlist, setColorfilterlist] = useState([])
+    const [pricefilterlist, setPricefilterlist] = useState([])
+    const [discountfilterlist, setDiscountfilterlist] = useState([])
+    const [ratingfilterlist, setRatingfilterlist] = useState([])
     const [categoryname, setCategoryName] = useState('')
     const [categoryid, setCategoryId] = useState('')
     const [count, setCount] = useState(0)
@@ -22,14 +28,43 @@ export default function ProductListComponent({ id }) {
     const [page, setPage] = useState(0)
     const [offset, setoffset] = useState('0')
 
-    useEffect(() => {
-        getdata(id, limit, offset)
-        getcategorydata(id)
-    }, [limit, offset])
+    const [categoryfiltteridarray, setcategoryfiltteridArray] = useState([])
+    const [sizefiltter, setsizefiltter] = useState('')
+    const [colorfiltter, setcolorfiltter] = useState('')
+    const [pricefiltter, setpricefiltter] = useState('')
+    const [discountfiltter, setdiscountfiltter] = useState('')
+    const [ratingfiltter, setratingfiltter] = useState('')
 
-    const getdata = async (id, l, s) => {
+    const [sortdropdown, setSortdropdown] = useState('Relevance')
+
+
+    useEffect(() => {
+        getdata(id, limit, offset, categoryfiltteridarray, sizefiltter, colorfiltter, pricefiltter, discountfiltter, ratingfiltter, sortdropdown)
+        getcategorydata(id)
+    }, [limit, offset, categoryfiltteridarray, sizefiltter, colorfiltter, pricefiltter, discountfiltter, ratingfiltter, sortdropdown])
+
+    useEffect(() => {
+        getfilterdata(id)
+    }, [])
+
+    const getdata = async (id, l, s, c, size, color, price, discount, rating, sd) => {
         showLoader()
-        let data = { mstcategoryid: id, mstconsumerid: getLocalStorageData('consumer')?._id, limit: l, skip: s, list: true }
+        let data = {
+            mstcategoryid: id,
+            mstconsumerid: getLocalStorageData('consumer')?._id,
+            limit: l,
+            skip: s,
+            categoryfiltteridarray: c,
+            colorfiltter: color,
+            sizefiltter: size,
+            pricefiltter: price,
+            discountfiltter: discount,
+            ratingfiltter: rating,
+            sortdropdown: sd,
+            list: true
+        }
+        console.log("data", data);
+
         let response = await productlistapi(data)
         if (response.success) {
             const { result, listlength } = response;
@@ -92,10 +127,10 @@ export default function ProductListComponent({ id }) {
             let data = { mstconsumerid: getLocalStorageData('consumer')._id, mstproductid: item._id, status: item.favourite == "1" ? "1" : "0", addfavourite: true }
             let response = await favouriteapi(data)
             if (response.success) {
-                getdata(id, limit, offset)
+                getdata(id, limit, offset, categoryfiltteridarray, sizefiltter, colorfiltter, pricefiltter, discountfiltter, ratingfiltter, sortdropdown)
                 onMessage(response.message, true)
             } else {
-                getdata(id, limit, offset)
+                getdata(id, limit, offset, categoryfiltteridarray, sizefiltter, colorfiltter, pricefiltter, discountfiltter, ratingfiltter, sortdropdown)
                 onMessage(response.message, false)
             }
         }
@@ -109,6 +144,33 @@ export default function ProductListComponent({ id }) {
         }
     }
 
+    const getfilterdata = async (id) => {
+        showLoader()
+        let data = { mstcategoryid: id, filtterlist: true }
+        let response = await productlistapi(data)
+        if (response.success) {
+            const { result } = response;
+            setCategoryfilterlist(result.category)
+            setSizefilterlist(result.size)
+            setColorfilterlist(result.color)
+            setPricefilterlist(result.price)
+            setDiscountfilterlist(result.discount)
+            setRatingfilterlist(result.rating)
+        } else {
+            setCategoryfilterlist([])
+            setSizefilterlist([])
+            setColorfilterlist([])
+            setPricefilterlist([])
+            setDiscountfilterlist([])
+            setRatingfilterlist([])
+            hideLoader()
+        }
+    }
+
+    const getfiltercategory = (number) => {
+        setcategoryfiltteridArray(nums => nums.includes(number) ? nums.filter(n => n !== number) : [number, ...nums])
+    }
+
     return (
         <>
             {
@@ -117,11 +179,16 @@ export default function ProductListComponent({ id }) {
                         <div className="lists-head">
                             <h4>Found results for <strong>{categoryname}</strong> <span>(Showing {count} items)</span></h4>
                             <div className="filtr-srch">
-                                <select className="form-select">
-                                    <option>Sort by Featured</option>
-                                    <option>Sort by Popular</option>
-                                    <option>Sort by Featured</option>
-                                    <option>Sort by Featured</option>
+                                <select
+                                    className="form-select"
+                                    value={sortdropdown}
+                                    onChange={(e) => { setSortdropdown(e.target.value) }}
+                                >
+                                    <option value="Relevance">Relevance</option>
+                                    <option value="High to Low">Price (High to Low)</option>
+                                    <option value="Low to High">Price (Low to High)</option>
+                                    <option value="Discount">Discount</option>
+                                    <option value="Rating">Rating</option>
                                 </select>
                             </div>
                         </div>
@@ -137,95 +204,220 @@ export default function ProductListComponent({ id }) {
                                 <div className="prod-info">
                                     <div className="prod-info-inner">
                                         <div className="headng">
-                                            <h4>Filters</h4>
-                                        </div>
+                                            <div className='filter-clear'>
+                                                <h4>Filters</h4>
+                                                <button>Clear All</button>
+                                            </div></div>
                                         <div className="accordion" id="accordionExample">
-                                            <div className="accordion-item">
-                                                <h2 className="accordion-header">
-                                                    <button className="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                                        data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
-                                                        Size
-                                                    </button>
-                                                </h2>
-                                                <div id="collapseOne" className="accordion-collapse collapse show" data-bs-parent="#accordionExample">
-                                                    <div className="accordion-body">
-                                                        <ul>
-                                                            <li>
-                                                                <div className="form-group">
-                                                                    <label htmlFor="checkbox1">Lorem Ipsum (123) </label><input type="checkbox" id="checkbox1" />
+                                            {
+                                                categoryfilterlist.length > 0 ?
+                                                    <>
+                                                        <div className="accordion-item">
+                                                            <h2 className="accordion-header">
+                                                                <button className="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                                                    data-bs-target="#collapsecategory" aria-expanded="false" aria-controls="collapsecategory">
+                                                                    Category
+                                                                </button>
+                                                            </h2>
+                                                            <div id="collapsecategory" className="accordion-collapse collapse show" data-bs-parent="#accordionExample">
+                                                                <div className="accordion-body">
+                                                                    <ul>
+                                                                        {
+                                                                            categoryfilterlist.map((item, i) => (
+                                                                                <li key={i}>
+                                                                                    <div className="form-group">
+                                                                                        <input
+                                                                                            type="checkbox"
+                                                                                            id={"checkbox" + item.name}
+                                                                                            value=""
+                                                                                            onChange={(e) => { getfiltercategory(item._id) }}
+                                                                                        />
+                                                                                        <label htmlFor={"checkbox" + item.name}>{item.name} </label>
+                                                                                    </div>
+                                                                                </li>
+                                                                            ))
+                                                                        }
+                                                                    </ul>
                                                                 </div>
+                                                            </div>
+                                                        </div>
+                                                    </>
+                                                    :
+                                                    <></>
+                                            }
 
-                                                            </li>
-                                                            <li>
-                                                                <div className="form-group">
-                                                                    <label htmlFor="checkbox2">Lorem Ipsum (1230)</label><input type="checkbox" id="checkbox2" />
-                                                                </div>
-                                                            </li>
-                                                            <li>
-                                                                <div className="form-group">
-                                                                    <label htmlFor="checkbox3">Lorem Ipsum (13) </label><input type="checkbox" id="checkbox3" />
-                                                                </div>
+                                            {
+                                                sizefilterlist.length > 0 ?
+                                                    <div className="accordion-item">
+                                                        <h2 className="accordion-header">
+                                                            <button className="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                                                data-bs-target="#collapsesize" aria-expanded="false" aria-controls="collapsesize">
+                                                                Size
+                                                            </button>
+                                                        </h2>
+                                                        <div id="collapsesize" className="accordion-collapse collapse" data-bs-parent="#accordionExample">
+                                                            <div className="accordion-body">
+                                                                <ul>
+                                                                    {
+                                                                        sizefilterlist.map((item, i) => (
+                                                                            <li key={i}>
+                                                                                <div className="form-group">
+                                                                                    <input
+                                                                                        type="checkbox"
+                                                                                        id={"checkbox" + item}
+                                                                                        value=""
+                                                                                        onChange={(e) => { !sizefiltter ? setsizefiltter(item) : setsizefiltter('') }}
+                                                                                    />
+                                                                                    <label htmlFor={"checkbox" + item}>{item} </label>
+                                                                                </div>
+                                                                            </li>
+                                                                        ))
+                                                                    }
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    :
+                                                    <></>
+                                            }
 
-                                                            </li>
-                                                            <li>
-                                                                <div className="form-group">
-                                                                    <label htmlFor="checkbox4">Lorem Ipsum</label><input type="checkbox" id="checkbox4" />
-                                                                </div>
-                                                            </li>
-                                                            <li>
-                                                                <div className="form-group">
-                                                                    <label htmlFor="checkbox5">Lorem Ipsum </label><input type="checkbox" id="checkbox5" />
-                                                                </div>
 
-                                                            </li>
-                                                            <li>
-                                                                <div className="form-group">
-                                                                    <label htmlFor="checkbox6">Lorem Ipsum </label><input type="checkbox" id="checkbox6" />
-                                                                </div>
-                                                            </li>
-                                                        </ul>
+                                            {
+                                                colorfilterlist.length > 0 ?
+                                                    <div className="accordion-item">
+                                                        <h2 className="accordion-header">
+                                                            <button className="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                                                data-bs-target="#collapsecolor" aria-expanded="false" aria-controls="collapsecolor">
+                                                                Color
+                                                            </button>
+                                                        </h2>
+                                                        <div id="collapsecolor" className="accordion-collapse collapse" data-bs-parent="#accordionExample">
+                                                            <div className="accordion-body">
+                                                                <ul>
+                                                                    {
+                                                                        colorfilterlist.map((item, i) => (
+                                                                            <li key={i}>
+                                                                                <div className="form-group">
+                                                                                    <input
+                                                                                        type="checkbox"
+                                                                                        id={"checkbox" + item}
+                                                                                        value=""
+                                                                                        onChange={(e) => { !colorfiltter ? setcolorfiltter(item) : setcolorfiltter('') }}
+                                                                                    />
+                                                                                    <label htmlFor={"checkbox" + item}>{item} </label>
+                                                                                </div>
+                                                                            </li>
+                                                                        ))
+                                                                    }
+                                                                </ul>
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            </div>
-                                            <div className="accordion-item">
-                                                <h2 className="accordion-header">
-                                                    <button className="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                                        data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-                                                        Brand
-                                                    </button>
-                                                </h2>
-                                                <div id="collapseThree" className="accordion-collapse collapse" data-bs-parent="#accordionExample">
-                                                    <div className="accordion-body">
-                                                        Enter the pincode of your area to check product availability and delivery options
+                                                    :
+                                                    <></>
+                                            }
+                                            {
+                                                pricefilterlist.length > 0 ?
+                                                    <div className="accordion-item">
+                                                        <h2 className="accordion-header">
+                                                            <button className="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                                                data-bs-target="#collapseprice" aria-expanded="false" aria-controls="collapseprice">
+                                                                Price
+                                                            </button>
+                                                        </h2>
+                                                        <div id="collapseprice" className="accordion-collapse collapse" data-bs-parent="#accordionExample">
+                                                            <div className="accordion-body">
+                                                                <ul>
+                                                                    {
+                                                                        pricefilterlist.map((item, i) => (
+                                                                            <li key={i}>
+                                                                                <div className="form-group">
+                                                                                    <input
+                                                                                        type="checkbox"
+                                                                                        id={"checkbox" + item.value}
+                                                                                        value=""
+                                                                                        onChange={(e) => { !pricefiltter ? setpricefiltter(item.value) : setpricefiltter('') }}
+                                                                                    />
+                                                                                    <label htmlFor={"checkbox" + item.value}>{item.value} </label>
+                                                                                </div>
+                                                                            </li>
+                                                                        ))
+                                                                    }
+                                                                </ul>
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            </div>
-                                            <div className="accordion-item">
-                                                <h2 className="accordion-header">
-                                                    <button className="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                                        data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
-                                                        Price
-                                                    </button>
-                                                </h2>
-                                                <div id="collapseFour" className="accordion-collapse collapse" data-bs-parent="#accordionExample">
-                                                    <div className="accordion-body">Enter the pincode of your area to check product availability and
-                                                        delivery options
+                                                    :
+                                                    <></>
+                                            }
+                                            {
+                                                discountfilterlist.length > 0 ?
+                                                    <div className="accordion-item">
+                                                        <h2 className="accordion-header">
+                                                            <button className="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                                                data-bs-target="#collapsediscount" aria-expanded="false" aria-controls="collapsediscount">
+                                                                Discount
+                                                            </button>
+                                                        </h2>
+                                                        <div id="collapsediscount" className="accordion-collapse collapse" data-bs-parent="#accordionExample">
+                                                            <div className="accordion-body">
+                                                                <ul>
+                                                                    {
+                                                                        discountfilterlist.map((item, i) => (
+                                                                            <li key={i}>
+                                                                                <div className="form-group">
+                                                                                    <input
+                                                                                        type="checkbox"
+                                                                                        id={"checkbox" + item.value}
+                                                                                        value=""
+                                                                                        onChange={(e) => { !discountfiltter ? setdiscountfiltter(item.value) : setdiscountfiltter('') }}
+                                                                                    />
+                                                                                    <label htmlFor={"checkbox" + item.value}>{item.value} </label>
+                                                                                </div>
+                                                                            </li>
+                                                                        ))
+                                                                    }
+                                                                </ul>
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            </div>
-                                            <div className="accordion-item">
-                                                <h2 className="accordion-header">
-                                                    <button className="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                                        data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
-                                                        Discount
-                                                    </button>
-                                                </h2>
-                                                <div id="collapseFive" className="accordion-collapse collapse" data-bs-parent="#accordionExample">
-                                                    <div className="accordion-body">Enter the pincode of your area to check product availability and
-                                                        delivery options
+                                                    :
+                                                    <></>
+                                            }
+                                            {
+                                                ratingfilterlist.length > 0 ?
+                                                    <div className="accordion-item">
+                                                        <h2 className="accordion-header">
+                                                            <button className="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                                                data-bs-target="#collapserating" aria-expanded="false" aria-controls="collapserating">
+                                                                Rating
+                                                            </button>
+                                                        </h2>
+                                                        <div id="collapserating" className="accordion-collapse collapse" data-bs-parent="#accordionExample">
+                                                            <div className="accordion-body">
+                                                                <ul>
+                                                                    {
+                                                                        ratingfilterlist.map((item, i) => (
+                                                                            <li key={i}>
+                                                                                <div className="form-group">
+                                                                                    <input
+                                                                                        type="checkbox"
+                                                                                        id={"checkbox" + item.value}
+                                                                                        value=""
+                                                                                        onChange={(e) => { !ratingfiltter ? setratingfiltter(item.value) : setratingfiltter('') }}
+                                                                                    />
+                                                                                    <label htmlFor={"checkbox" + item.value}>{item.value} </label>
+                                                                                </div>
+                                                                            </li>
+                                                                        ))
+                                                                    }
+                                                                </ul>
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            </div>
+                                                    :
+                                                    <></>
+                                            }
 
 
                                         </div>

@@ -2,7 +2,7 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { getLocalStorageData, hideLoader, opneLoginModal, removeLocalStorageData, setLocalStorageData, showLoader } from '../lib/common'
 import Image from 'next/image'
-import { cartapi, favouriteapi, productapi } from '../lib/apiService'
+import { cartapi, consumercategoryapi, favouriteapi, productapi } from '../lib/apiService'
 import { useRouter } from 'next/navigation'
 import InnerImageZoom from 'react-inner-image-zoom'
 import 'react-inner-image-zoom/lib/styles.min.css'
@@ -94,6 +94,7 @@ export default function ProductComponent({ id }) {
     ])
 
     useEffect(() => {
+        getCategoryData()
         getproductcategorydata(id)
         getproductimagedata(id)
         getproductdetailsdata(id)
@@ -103,6 +104,20 @@ export default function ProductComponent({ id }) {
         getproductattributedata(id)
         getproductvariantdata(id)
     }, [])
+
+    const getCategoryData = async () => {
+        let data = { list: true }
+        let response = await consumercategoryapi(data)
+        if (response.success) {
+            const { result } = response;
+            let temp = result
+            for (let t of temp) {
+                var element = document.getElementById("categoryactive" + t._id);
+                element.classList.remove("active");
+            }
+        } 
+    }
+
     const getproductcategorydata = async (id) => {
         showLoader()
         let data = { id: id, productcategory: true }
@@ -137,10 +152,12 @@ export default function ProductComponent({ id }) {
         removeLocalStorageData("pathName")
         setLocalStorageData('pathName', path)
     }
+
     const removeCategoryClass = () => {
         var element = document.getElementById("categoryactive" + categoryid);
         element.classList.remove("active");
     }
+
     const getproductimagedata = async (id) => {
         showLoader()
         let data = { id: id, productimage: true }
@@ -150,10 +167,17 @@ export default function ProductComponent({ id }) {
             setImagesArray(result)
             let temp = result
             let o = []
-            for (let [i, t] of temp.entries()) {
-                if (t.productmainimage == '1') {
+            if (temp.length > 1) {
+                for (let [i, t] of temp.entries()) {
+                    if (t.productmainimage == '1') {
+                        setImages(t.productimage);
+                    } else {
+                        o.push(t)
+                    }
+                }
+            } else {
+                for (let [i, t] of temp.entries()) {
                     setImages(t.productimage);
-                } else {
                     o.push(t)
                 }
             }
@@ -190,8 +214,8 @@ export default function ProductComponent({ id }) {
             setProductmrp(result.productmrp)
             setProductdiscount(result.productdiscount)
             setProductquantity(result.productquantity)
-            let netprice = (result.productdiscount / 100) * result.productmrp
-            setProductnetprice(result.productmrp - netprice)
+            let netprice = (Number(result.productdiscount) / 100) * Number(result.productmrp)
+            setProductnetprice((Number(result.productmrp) - Number(netprice)).toFixed())
             setFavourite(result.favourite)
             hideLoader()
         } else {
@@ -335,6 +359,14 @@ export default function ProductComponent({ id }) {
         }
     }
 
+    const checkuser = (path) => {
+        if (!getLocalStorageData('consumer')?._id) {
+            opneLoginModal()
+        } else {
+            goto(path)
+        }
+    }
+
 
     return (
         <>
@@ -389,7 +421,7 @@ export default function ProductComponent({ id }) {
                                                     productquantity !== "0" ?
                                                         <>
                                                             <button className="btn btn-add-card" onClick={() => { addtocartevent() }}>Add to Cart</button>
-                                                            <button className="btn btn-buy">Buy Now</button>
+                                                            <button className="btn btn-buy" onClick={() => { checkuser('/cart?type=' + productid) }}>Buy Now</button>
                                                         </>
                                                         :
                                                         <button className="btn btn-buy w-100">Notify Me</button>

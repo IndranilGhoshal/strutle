@@ -207,5 +207,35 @@ export async function POST(request) {
             message = "Product variant not found"
         }
     }
+    //Product Search
+    else if(payload.search){
+        filter = { status: { $in: ['0'] } };
+        let results = await productSchema.find(filter);
+        if (results.length>0) {
+            let temp = results
+            let o = []
+            for(let t of temp){
+                o.push(t.productname)
+            }
+            result = o
+            success = true
+            message = "Product found"
+        } else {
+            success = false
+            message = "Product not found"
+        }
+    }
+    else if(payload.searchid){
+        filter = { productname: payload.productname, status: { $in: ['0'] } };
+        let results = await productSchema.findOne(filter);
+        if (results) {
+            result = results._id
+            success = true
+            message = "Product id found"
+        } else {
+            success = false
+            message = "Product id not found"
+        }
+    }
     return NextResponse.json({ result, success, message })
 }

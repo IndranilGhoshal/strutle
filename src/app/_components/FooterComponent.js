@@ -1,7 +1,16 @@
 import Image from 'next/image'
+import { useRouter } from 'next/navigation'
 import React from 'react'
+import { removeLocalStorageData, setLocalStorageData, showLoader } from '../lib/common'
 
 export default function FooterComponent() {
+  const router = useRouter()
+  const goto = (path) => {
+    showLoader()
+    removeLocalStorageData("pathName")
+    setLocalStorageData('pathName', path)
+    router.push("/" + path)
+  }
   return (
     <>
       <footer className="footer">
@@ -57,6 +66,8 @@ export default function FooterComponent() {
               <li><a href="#">My Wishlist</a></li>
               <li><a href="#">Track My Order</a></li>
               <li><a href="#">Help Ticket</a></li>
+              <li><a onClick={()=>{goto("admin")}}>Admin Login</a></li>
+              <li><a >Seller Login</a></li>
             </ul>
           </div>
 

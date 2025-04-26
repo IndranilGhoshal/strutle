@@ -37,10 +37,17 @@ export default function ProductQuickViewModal({ id, resetid }) {
             setImagesArray(result)
             let temp = result
             let o = []
-            for (let [i, t] of temp.entries()) {
-                if (t.productmainimage == '1') {
+            if (temp.length > 1) {
+                for (let [i, t] of temp.entries()) {
+                    if (t.productmainimage == '1') {
+                        setImages(t.productimage);
+                    } else {
+                        o.push(t)
+                    }
+                }
+            } else {
+                for (let [i, t] of temp.entries()) {
                     setImages(t.productimage);
-                } else {
                     o.push(t)
                 }
             }
@@ -86,7 +93,7 @@ export default function ProductQuickViewModal({ id, resetid }) {
             setProducttitledescription(result.producttitledescription)
             setProductmrp(result.productmrp)
             setProductdiscount(result.productdiscount)
-            let netprice = (result.productdiscount / 100) * result.productmrp
+            let netprice = ((result.productdiscount / 100) * result.productmrp).toFixed()
             setProductnetprice(result.productmrp - netprice)
             setIsLoad(true)
             hideLoader()

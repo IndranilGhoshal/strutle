@@ -8,12 +8,14 @@ import Dropdown from 'react-bootstrap/Dropdown';
 import { useRouter } from 'next/navigation'
 import { consumercategoryapi } from '../lib/apiService'
 import { AppContext } from '../consumer/layout'
+import AutocompleteSearch from './AutocompleteSearch'
 
 export default function HeaderComponent() {
     const { userImage } = useContext(AppContext);
     const { cartCount } = useContext(AppContext);
     const [user, setUser] = useState({})
     const [categorylist, setCategoryList] = useState([])
+
     useEffect(() => {
         let u = getLocalStorageData('consumer')
         if (u) {
@@ -32,7 +34,7 @@ export default function HeaderComponent() {
     }
     const goto = (path) => {
         showLoader()
-        if(path == "/myaccount?tab=my-favrot-tab" || "/myaccount?tab=my-order-tab" || "/myaccount?tab=personal-info-tab"){
+        if (path == "/myaccount?tab=my-favrot-tab" || "/myaccount?tab=my-order-tab" || "/myaccount?tab=personal-info-tab") {
             router.push('/')
         }
         setTimeout(() => {
@@ -40,10 +42,10 @@ export default function HeaderComponent() {
         }, 100);
         removeLocalStorageData("pathName")
         setLocalStorageData('pathName', path)
-        if (path == "/" || 
-            "/myaccount?tab=my-favrot-tab" || 
-            "/myaccount?tab=my-order-tab" || 
-            "/myaccount?tab=personal-info-tab" || 
+        if (path == "/" ||
+            "/myaccount?tab=my-favrot-tab" ||
+            "/myaccount?tab=my-order-tab" ||
+            "/myaccount?tab=personal-info-tab" ||
             '/cart') {
             getCategoryData()
         }
@@ -55,6 +57,7 @@ export default function HeaderComponent() {
         removeLocalStorageData("consumer")
         removeLocalStorageData("pathName")
         router.push("/consumer")
+        cartCount(0)
         toast.success("User logout successfully!")
         hideLoader()
     }
@@ -142,7 +145,7 @@ export default function HeaderComponent() {
         }
     }
 
-    const checkuser =(path)=>{
+    const checkuser = (path) => {
         if (!getLocalStorageData('consumer')?._id) {
             opneLoginModal()
         } else {
@@ -160,6 +163,7 @@ export default function HeaderComponent() {
                             src={'/assets/img/srutle-logo.png'}
                             width={300}
                             height={100}
+                            priority
                             alt='logo'
                         />
                     </div>
@@ -169,14 +173,14 @@ export default function HeaderComponent() {
                             <p>Enter your location</p>
                         </div>
                     </div>
-                    <div className="search-bar">
-                        <input type="text" placeholder="Search for products, categories or brands" />
+                    <div className="search-bar ">
+                        <AutocompleteSearch />
                         <button className="btn btn-search"><i className="bi bi-search"></i></button>
                     </div>
                     <div className="user-actions dropdown">
                         <a onClick={() => { checkuser('/myaccount?tab=my-order-tab') }}><i className="bi bi-box-fill"></i> <strong>Orders</strong></a>
                         <a onClick={() => { checkuser('/myaccount?tab=my-favrot-tab') }}><i className="bi bi-heart-fill"></i> <strong>Favorites</strong></a>
-                        <a className="position-relative" onClick={() => { checkuser('/cart') }}>
+                        <a className="position-relative" onClick={() => { checkuser('/cart?type=cart') }}>
                             <i className="bi bi-cart-fill"></i> <strong>Cart </strong>
                             {
                                 cartCount > 0
@@ -233,9 +237,10 @@ export default function HeaderComponent() {
                 <div className="head-menu">
                     <div className="navigation" id="cssmenu">
                         <ul>
+
                             {
                                 categorylist && categorylist.map((item, i) => (
-                                    <li key={i}><a id={"categoryactive" + item._id} onClick={() => { goto('/productlist/' + item._id), onClassChange(i) }} className={`${item.active ? "active" : ""}`}>{item.name}</a></li>
+                                    <li key={i}><a id={"categoryactive" + item._id} onClick={() => { goto('/productlist/' + item._id), onClassChange(i) }} className={`${item.active ? "active" : ""}`} >{item.name}</a></li>
                                 ))
                             }
                         </ul>

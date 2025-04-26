@@ -26,7 +26,7 @@ export async function POST(request) {
                 let color = await productcolorvariantsvaluesSchema.findOne({ mstproductid: t.mstproductid, status: { $in: ['0'] } })
                 let obj = {
                     _id: t._id,
-                    mstproductid:t.mstproductid,
+                    mstproductid: t.mstproductid,
                     productimage: image.productimage,
                     productname: product.productname,
                     producttitledescription: product.producttitledescription,
@@ -53,7 +53,7 @@ export async function POST(request) {
         filter = { mstconsumerid: payload.mstconsumerid, saveaslater: { $in: ['0'] }, status: { $in: ['0'] } };
         let results = await cartSchema.find(filter);
         if (results) {
-            result = results.length
+            result = results.length == 0 ? 0 : results.length
             success = true
             message = "Cart Item found"
         } else {
@@ -156,10 +156,10 @@ export async function POST(request) {
             let deliveryamount = 0;
             let totalamount = 0;
             for (let t of temp) {
-                let netdiscount = (Number(t.productdiscount) / 100) * Number(t.productmrp)
-                subtotal = Number(subtotal) + (Number(t.productquantity) * Number(t.productmrp))
-                totaldiscount = Number(totaldiscount) + (Number(t.productquantity) * Number(netdiscount))
-                totalamount = Number(subtotal) - Number(totaldiscount)
+                let netdiscount = ((Number(t.productdiscount) / 100) * Number(t.productmrp)).toFixed()
+                subtotal = (Number(subtotal) + (Number(t.productquantity) * Number(t.productmrp))).toFixed()
+                totaldiscount = (Number(totaldiscount) + (Number(t.productquantity) * Number(netdiscount))).toFixed()
+                totalamount = (Number(subtotal) - Number(totaldiscount)).toFixed()
             }
             let obj = {
                 subtotal: subtotal,
@@ -234,6 +234,39 @@ export async function POST(request) {
         } else {
             success = false
             message = "Internal server error"
+        }
+    }
+    //buy now price summary
+    else if (payload.buynowpricesummary) {
+        filter = { _id: payload.id, status: { $in: ['0'] } };
+        let results = await productSchema.findOne(filter);
+        if (results) {
+            let temp = results
+            let subtotal = 0;
+            let totaldiscount = 0;
+            let couponamount = 0;
+            let deliveryamount = 0;
+            let totalamount = 0;
+
+            let netdiscount = ((Number(temp.productdiscount) / 100) * Number(temp.productmrp)).toFixed()
+            subtotal = (Number(subtotal) + (1 * Number(temp.productmrp))).toFixed()
+            totaldiscount = (Number(totaldiscount) + (1 * Number(netdiscount))).toFixed()
+            totalamount = (Number(subtotal) - Number(totaldiscount)).toFixed()
+            
+            let obj = {
+                subtotal: subtotal,
+                totaldiscount: totaldiscount,
+                couponamount: couponamount,
+                deliveryamount: deliveryamount,
+                totalamount: totalamount
+            }
+            
+            result = obj
+            success = true
+            message = "Price found"
+        } else {
+            success = false
+            message = "Price not found"
         }
     }
 

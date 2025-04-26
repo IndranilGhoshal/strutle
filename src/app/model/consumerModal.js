@@ -42,6 +42,7 @@ const productlistModel = new mongoose.Schema({
     productmrp:String,
     productquantity:String,
     productdiscount:String,
+    igst:String,
     status:String,
     createdAt:String
 },
@@ -121,6 +122,7 @@ const cartModel = new mongoose.Schema({
     productdiscount:String,
     productnetprice:String,
     saveaslater:String,
+    orderid:String,
     status:String,
     createdAt:String
 },
@@ -287,3 +289,87 @@ const orderproductshippingstatusModel = new mongoose.Schema({
 });
 
 export const orderproductshippingstatusSchema = mongoose.models.mstorderproductshippingstatuses|| mongoose.model("mstorderproductshippingstatuses", orderproductshippingstatusModel);
+
+const giftcardModel = new mongoose.Schema({
+    image:String,
+    title:String,
+    description:String,
+    status:String,
+    createdAt:String
+},
+{
+    timestamps:true
+});
+
+export const giftcardsSchema = mongoose.models.mstgiftcards || mongoose.model("mstgiftcards", giftcardModel);
+
+const giftcarddetailsModel = new mongoose.Schema({
+    mstconsumerid:String,
+    mstgiftcardsid:String,
+    image:String,
+    amount:String,
+    sendername:String,
+    senderemail:String,
+    status:String,
+    createdAt:String
+},
+{
+    timestamps:true
+});
+
+export const giftcarddetailsSchema = mongoose.models.mstgiftcarddetails || mongoose.model("mstgiftcarddetails", giftcarddetailsModel);
+
+const giftcardrecipientdetailsModel = new mongoose.Schema({
+    mstgiftcardsid:String,
+    mstgiftcarddetailsid:String,
+    recipientname:String,
+    image:String,
+    card:String,
+    amount:String,
+    recipientemail:String,
+    recipientmessage:String,
+    status:String,
+    createdAt:String
+},
+{
+    timestamps:true
+});
+
+export const giftcardrecipientdetailsSchema = mongoose.models.mstgiftcardrecipientdetails || mongoose.model("mstgiftcardrecipientdetails", giftcardrecipientdetailsModel);
+
+const giftcardpaymentsModel = new mongoose.Schema({
+    mstconsumerid:String,
+    mstgiftcardsid:String,
+    mstgiftcarddetailsid:String,
+    ordercreationid:String,
+    razorpaypaymentid:String,
+    razorpayorderid:String,
+    razorpaysignature:String,
+    paymenttype:String,
+    paymentamount:String,
+    paymentstatus:String,
+    status:String,
+    createdAt:String
+},
+{
+    timestamps:true
+});
+
+export const giftcardpaymentsSchema = mongoose.models.mstgiftcardpayments || mongoose.model("mstgiftcardpayments", giftcardpaymentsModel);
+
+const sellerModel = new mongoose.Schema({
+    image:String,
+    firstname:String,
+    lastname:String,
+    email:String,
+    phone:String,
+    status:String,
+    password:String,
+    storename:String,
+    createdAt:String
+},
+{
+    timestamps:true
+});
+
+export const sellerSchema = mongoose.models.mstsellers || mongoose.model("mstsellers", sellerModel);

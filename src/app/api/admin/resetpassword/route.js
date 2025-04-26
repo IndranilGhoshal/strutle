@@ -3,52 +3,62 @@ import { adminSchema } from "@/app/model/adminModel";
 import mongoose from "mongoose";
 import { NextResponse } from "next/server";
 import { dencryptFunction, encryptFunction } from "../../_apiFunction/EncryptDecryptFunction";
+import { StatusCodes } from "../../_apiFunction/StatusCode";
 
 
 export async function PUT(request) {
-    const payload = await request.json();
-    let success = false;
-    let message;
-    let result;
-    await mongoose.connect(connectionStr, { useNewUrlParser: true });
-
-    if(payload.accountreset){
-        const checkResult = await adminSchema.find({ _id: payload.id })
-        if (checkResult.length > 0) {
-            if (dencryptFunction(checkResult[0].password) !== payload.password) {
-                let r = await adminSchema.findOneAndUpdate({ _id: payload.id }, { password: encryptFunction(payload.password), isfirstlogin:"1", status:"0" })
-                if (r) {
-                    result = await adminSchema.findOne({ _id: payload.id })
-                    success = true
-                    message = "The password has been reset successfully"
+    try {
+        const payload = await request.json();
+        let success = false;
+        let message;
+        let result;
+        let responsestatus;
+        await mongoose.connect(connectionStr, { useNewUrlParser: true });
+        if (payload.accountreset) {
+            const checkResult = await adminSchema.find({ _id: payload.id })
+            if (checkResult.length > 0) {
+                if (dencryptFunction(checkResult[0].password) !== payload.password) {
+                    let r = await adminSchema.findOneAndUpdate({ _id: payload.id }, { password: encryptFunction(payload.password), isfirstlogin: "1", status: "0" })
+                    if (r) {
+                        result = await adminSchema.findOne({ _id: payload.id })
+                        responsestatus = StatusCodes.SUCCESS
+                        success = true
+                        message = "The password has been reset successfully"
+                    }
+                } else {
+                    responsestatus = StatusCodes.INTERNAL_SERVER_ERROR
+                    success = false
+                    message = "New password can not be same as last old password"
                 }
             } else {
+                responsestatus = StatusCodes.Unauthorized
                 success = false
-                message = "New password can not be same as last old password"
+                message = "User Not Found!"
             }
-        } else {
-            success = false
-            message = "User Not Found!"
         }
-    }else{
-        const checkResult = await adminSchema.find({ _id: payload.id })
-        if (checkResult.length > 0) {
-            if (dencryptFunction(checkResult[0].password) !== payload.password) {
-                result = await adminSchema.findOneAndUpdate({ _id: payload.id }, { password: encryptFunction(payload.password) })
-                if (result) {
-                    success = true
-                    message = "The password has been reset successfully"
+        else {
+            const checkResult = await adminSchema.find({ _id: payload.id })
+            if (checkResult.length > 0) {
+                if (dencryptFunction(checkResult[0].password) !== payload.password) {
+                    result = await adminSchema.findOneAndUpdate({ _id: payload.id }, { password: encryptFunction(payload.password) })
+                    if (result) {
+                        responsestatus = StatusCodes.SUCCESS
+                        success = true
+                        message = "The password has been reset successfully"
+                    }
+                } else {
+                    responsestatus = StatusCodes.INTERNAL_SERVER_ERROR
+                    success = false
+                    message = "New password can not be same as last old password"
                 }
             } else {
+                responsestatus = StatusCodes.Unauthorized
                 success = false
-                message = "New password can not be same as last old password"
+                message = "User Not Found!"
             }
-        } else {
-            success = false
-            message = "User Not Found!"
         }
+        return NextResponse.json({ result, success, message, status: responsestatus, error: 0 });
+    } catch (e) {
+        return NextResponse.json({ result: null, success: false, status: StatusCodes.INTERNAL_SERVER_ERROR, error: 1 })
     }
-
-    
-    return NextResponse.json({ result, success, message });
 }

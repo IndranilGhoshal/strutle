@@ -45,7 +45,7 @@ export default function LogoutModal() {
                     <Button variant="secondary" onClick={handleClose}>
                         No
                     </Button>
-                    <Button variant="primary" onClick={logoutEvent}>
+                    <Button id="adminlogoutbtn" variant="primary" onClick={logoutEvent}>
                         Yes
                     </Button>
                 </Modal.Footer>

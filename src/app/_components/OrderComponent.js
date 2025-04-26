@@ -1,10 +1,50 @@
+'use client'
 import moment from 'moment'
 import Image from 'next/image'
-import React from 'react'
+import React, { useState } from 'react'
 import UsePagination from './UsePagination'
 import InvoiceModal from './_modal/InvoiceModal'
+import { orderapi } from '@/app/lib/apiService'
+import { getLocalStorageData, hideLoader, removeLocalStorageData, setLocalStorageData, showLoader } from '@/app/lib/common'
+import { useRouter } from 'next/navigation'
 
-export default function OrderComponent({ handleChangeOrderDataPage, orderList, pageorderList, goto, orderSearch, setorderSearch }) {
+export default function OrderComponent({ handleChangeOrderDataPage, orderList, pageorderList, orderSearch, setorderSearch }) {
+    const router = useRouter();
+    const [productlist, setProductlist] = useState([])
+    const [totalamount, settotalamount] = useState('')
+    const [ordernumber, setordernumber] = useState('')
+    const [orderdate, setorderdate] = useState('')
+    const [consumeraddress, setconsumeraddress] = useState({})
+
+    const getInvoice = async (id) => {
+        showLoader()
+        let data = { id: id, mstconsumerid: getLocalStorageData('consumer')._id, invioce: true }
+        let response = await orderapi(data)
+        if (response.success) {
+            let { result } = response
+            setProductlist(result.product)
+            settotalamount(result.totalamount)
+            setconsumeraddress(result.consumeraddress)
+            setorderdate(result.orderdate)
+            setordernumber(result._id)
+            hideLoader()
+        } else {
+            setProductlist([])
+            settotalamount(0)
+            setconsumeraddress({})
+            setorderdate('')
+            setordernumber('')
+            hideLoader()
+        }
+    }
+
+    const goto = (path) => {
+        showLoader()
+        router.push("/consumer" + path)
+        removeLocalStorageData("pathName")
+        setLocalStorageData('pathName', path)
+    }
+
     return (
         <>
             <div className="ord-div">
@@ -53,7 +93,15 @@ export default function OrderComponent({ handleChangeOrderDataPage, orderList, p
                                                             <span>{moment(item.orderdate).format('LL')}</span>
                                                         </li>
                                                         <li><strong>Invoice</strong>
-                                                            <InvoiceModal />
+                                                            <InvoiceModal
+                                                                id={item._id}
+                                                                productlist={productlist}
+                                                                getInvoice={getInvoice}
+                                                                totalamount={totalamount}
+                                                                consumeraddress={consumeraddress}
+                                                                ordernumber={ordernumber}
+                                                                orderdate={orderdate}
+                                                            />
                                                         </li>
                                                     </ul>
                                                     <div className="totl-pay">
@@ -86,14 +134,14 @@ export default function OrderComponent({ handleChangeOrderDataPage, orderList, p
                                                                 </div>
                                                                 {
                                                                     ind == "0" ?
-                                                                        <div className="ord-lst-btn"><button className="btn btn-viw-ordr" onClick={()=>{goto('/orderdetails')}}>View Order</button></div> :
+                                                                        <div className="ord-lst-btn"><button className="btn btn-viw-ordr" onClick={() => { goto('/orderdetails/' + item._id) }}>View Order</button></div> :
                                                                         <></>
                                                                 }
 
                                                             </div>
                                                             <div className="ord-lst-bot">
                                                                 <ul>
-                                                                    <li><a href="">Rate & Review Product</a></li>
+                                                                    <li><a className='text-blue' onClick={() => { goto('/review') }}>Rate & Review Product</a></li>
                                                                     <li><a href="">Help & Support</a></li>
                                                                 </ul>
                                                             </div>

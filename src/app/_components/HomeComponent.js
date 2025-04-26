@@ -3,11 +3,11 @@ import React, { useEffect, useState } from 'react'
 import BannerCarousel from './BannerCarousel'
 import { hideLoader} from '../lib/common'
 import CategoryCarousel from './CategoryCarousel'
+import { getHsnFunction } from '../lib/hsnService'
 
 
 
 export default function HomeComponent() {
-
   return (
     <>
       <div className="category-grid padding ctg">

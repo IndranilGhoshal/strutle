@@ -2,9 +2,11 @@
 import React, { createContext, useEffect, useState } from 'react'
 import HeaderComponent from '../_components/HeaderComponent'
 import FooterComponent from '../_components/FooterComponent'
-import { getLocalStorageData } from '../lib/common';
+import { getConnection, getLocalStorageData, internetconnectionflag } from '../lib/common';
 import { useRouter } from 'next/navigation';
 import { cartapi } from '../lib/apiService';
+import NoInternetConectionComponent from '../_components/NoInternetConectionComponent';
+import useNetworkStatus from '../lib/useNetworkStatus';
 
 // Create a new context and export
 export const AppContext = createContext();
@@ -12,6 +14,8 @@ export const AppContext = createContext();
 export default function layout({ children }) {
   const [userImage, setUserImage] = useState(undefined);
   const [cartCount, setCartCount] = useState(0);
+
+  const { isOnline } = useNetworkStatus();
 
   const router = useRouter()
   useEffect(() => {
@@ -38,13 +42,18 @@ export default function layout({ children }) {
 
   return (
     <>
-      <AppContext.Provider value={{ userImage, setUserImage, cartCount, setCartCount }}>
-        <HeaderComponent />
-        <div id="consumerid" className="main">
-          {children}
-        </div>
-        <FooterComponent />
-      </AppContext.Provider>
+      {
+        isOnline ?
+          <AppContext.Provider value={{ userImage, setUserImage, cartCount, setCartCount }}>
+            <HeaderComponent />
+            <div id="consumerid" className="main">
+              {children}
+            </div>
+            <FooterComponent />
+          </AppContext.Provider>
+          :
+          <NoInternetConectionComponent />
+      }
     </>
   )
 }

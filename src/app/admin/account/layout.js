@@ -24,7 +24,7 @@ export default function Layout({ children }) {
   }, [])
 
   const getMenu = async () => {
-    let response = await menuApi({ mstRolesId: getLocalStorageData('admin').mstroleid, list: true });
+    let response = await menuApi({ mstRolesId: getLocalStorageData('admin')?.mstroleid, list: true });
     if (response.success) {
       let res = response.result
       let t = []

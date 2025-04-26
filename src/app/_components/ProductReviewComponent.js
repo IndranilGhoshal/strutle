@@ -1,21 +1,62 @@
 'use client'
 import Image from 'next/image'
 import React, { useEffect, useState } from 'react'
-import { getLocalStorageData, hideLoader, showLoader } from '../lib/common'
-import { productreviewapi } from '../lib/apiService'
+import { getLocalStorageData, hideLoader, removeLocalStorageData, setLocalStorageData, showLoader } from '../lib/common'
+import { productapi, productreviewapi } from '../lib/apiService'
 import { Rating } from 'react-simple-star-rating'
 import moment from 'moment'
+import { useRouter } from 'next/navigation'
 
 export default function ProductReviewComponent({ id }) {
+    const router = useRouter()
     const [productname, setProductName] = useState('')
     const [productimage, setProductimage] = useState('')
     const [productcolor, setProductcolor] = useState('')
     const [reviewArray, setReviewArray] = useState([])
 
+    const [averate, setAverate] = useState('0')
+    const [onerateingpersent, setOnerateingpersent] = useState('0')
+    const [tworateingpersent, setTworateingpersent] = useState('0')
+    const [threerateingpersent, setThreerateingpersent] = useState('0')
+    const [fourrateingpersent, setFourrateingpersent] = useState('0')
+    const [fiverateingpersent, setFiverateingpersent] = useState('0')
+    const [categoryname, setCategoryName] = useState('')
+    const [categoryid, setCategoryId] = useState('')
+
     useEffect(() => {
+        getproductcategorydata(id)
         getproductdetailsdata(id)
         getproductreviewdata(id)
+        getproductratingdata(id)
     }, [])
+    const getproductcategorydata = async (id) => {
+        showLoader()
+        let data = { id: id, productcategory: true }
+        let response = await productapi(data)
+        if (response.success) {
+            const { result } = response;
+            setCategoryName(result.category);
+            setCategoryId(result.mstcategoryid);
+            setTimeout(() => {
+                addCategoryClass(result.mstcategoryid)
+            }, 500);
+            hideLoader()
+        } else {
+            setCategoryName('');
+            setCategoryId('')
+            hideLoader()
+        }
+    }
+    const addCategoryClass = (cid) => {
+        var element = document.getElementById("categoryactive" + cid);
+        element.classList.add("active");
+    }
+    const goto = (path) => {
+        showLoader()
+        router.push("/consumer" + path)
+        removeLocalStorageData("pathName")
+        setLocalStorageData('pathName', path)
+    }
     const getproductdetailsdata = async (id) => {
         showLoader()
         let data = { id: id, mstconsumerid: getLocalStorageData('consumer')?._id, productdetails: true }
@@ -46,8 +87,40 @@ export default function ProductReviewComponent({ id }) {
             hideLoader()
         }
     }
+    const getproductratingdata = async (id) => {
+        showLoader()
+        let data = { id: id, productrating: true }
+        let response = await productreviewapi(data)
+        if (response.success) {
+            const { result } = response;
+            setAverate(result.averate)
+            setOnerateingpersent(result.onerateingpersent)
+            setTworateingpersent(result.tworateingpersent)
+            setThreerateingpersent(result.threerateingpersent)
+            setFourrateingpersent(result.fourrateingpersent)
+            setFiverateingpersent(result.fiverateingpersent)
+            hideLoader()
+        } else {
+            setAverate(0)
+            setOnerateingpersent(0)
+            setTworateingpersent(0)
+            setThreerateingpersent(0)
+            setFourrateingpersent(0)
+            setFiverateingpersent(0)
+            hideLoader()
+        }
+    }
     return (
         <>
+            <div className="bred-cm">
+                <ul>
+                    <li className="bred-cm-it" onClick={() => { goto('/'); removeCategoryClass() }}>Home</li>
+                    <li><i className="bi bi-chevron-right"></i></li>
+                    <li className="bred-cm-it" onClick={() => { goto('/productlist/' + categoryid); }}>{categoryname}</li>
+                    <li><i className="bi bi-chevron-right"></i></li>
+                    <li className="bred-cm-curr"><p className='prdcrd-txt-wp'>{productname}</p></li>
+                </ul>
+            </div>
             <div className="product-review padding">
                 <div className="product-review-left">
                     <div className="product-review-left-inr">
@@ -64,59 +137,65 @@ export default function ProductReviewComponent({ id }) {
                                 <li>
                                     <div className="cust-ratng">5 <i className="bi bi-star-fill"></i></div>
                                     <div className="progress-div">
-                                        <div className="progress" role="progressbar" aria-label="Basic example" aria-valuenow="75"
-                                            aria-valuemin="0" aria-valuemax="100">
-                                            <div className="progress-bar w-75" style={{ backgroundColor: '#068743' }}></div>
+                                        <div
+                                            className="progress"
+                                            role="progressbar"
+                                            aria-label="Basic example" 
+                                            aria-valuenow="75"
+                                            aria-valuemin="0"
+                                            aria-valuemax="100"
+                                        >
+                                            <div className={`progress-bar ${fiverateingpersent?"w-"+fiverateingpersent:""}`} style={{ backgroundColor: '#068743' }}></div>
                                         </div>
                                     </div>
-                                    <strong>(72%)</strong>
+                                    <strong>({fiverateingpersent}%)</strong>
                                 </li>
                                 <li>
                                     <div className="cust-ratng">4 <i className="bi bi-star-fill"></i></div>
                                     <div className="progress-div">
                                         <div className="progress" role="progressbar" aria-label="Basic example" aria-valuenow="65"
                                             aria-valuemin="0" aria-valuemax="100">
-                                            <div className="progress-bar w-65" style={{ backgroundColor: '#068743' }}></div>
+                                            <div className={`progress-bar ${fourrateingpersent?"w-"+fourrateingpersent:""}`} style={{ backgroundColor: '#068743' }}></div>
                                         </div>
                                     </div>
-                                    <strong>(72%)</strong>
+                                    <strong>({fourrateingpersent}%)</strong>
                                 </li>
                                 <li>
                                     <div className="cust-ratng">3 <i className="bi bi-star-fill"></i></div>
                                     <div className="progress-div">
                                         <div className="progress" role="progressbar" aria-label="Basic example" aria-valuenow="55"
                                             aria-valuemin="0" aria-valuemax="100">
-                                            <div className="progress-bar w-55" style={{ backgroundColor: '#068743' }}></div>
+                                            <div className={`progress-bar ${threerateingpersent?"w-"+threerateingpersent:""}`} style={{ backgroundColor: '#068743' }}></div>
                                         </div>
                                     </div>
-                                    <strong>(72%)</strong>
+                                    <strong>({threerateingpersent}%)</strong>
                                 </li>
                                 <li>
                                     <div className="cust-ratng">2 <i className="bi bi-star-fill"></i></div>
                                     <div className="progress-div">
                                         <div className="progress" role="progressbar" aria-label="Basic example" aria-valuenow="45"
                                             aria-valuemin="0" aria-valuemax="100">
-                                            <div className="progress-bar w-45" style={{ backgroundColor: '#FFAD33' }}></div>
+                                            <div className={`progress-bar ${tworateingpersent?"w-"+tworateingpersent:""}`} style={{ backgroundColor: '#FFAD33' }}></div>
                                         </div>
                                     </div>
-                                    <strong>(72%)</strong>
+                                    <strong>({tworateingpersent}%)</strong>
                                 </li>
                                 <li>
                                     <div className="cust-ratng">1 <i className="bi bi-star-fill"></i></div>
                                     <div className="progress-div">
                                         <div className="progress" role="progressbar" aria-label="Basic example" aria-valuenow="35"
                                             aria-valuemin="0" aria-valuemax="100">
-                                            <div className="progress-bar w-35" style={{ backgroundColor: '#DF1200' }}></div>
+                                            <div className={`progress-bar ${onerateingpersent?"w-"+onerateingpersent:""}`} style={{ backgroundColor: '#DF1200' }}></div>
                                         </div>
                                     </div>
-                                    <strong>(72%)</strong>
+                                    <strong>({onerateingpersent}%)</strong>
                                 </li>
                             </ul>
                             <div className="over-all-rat">
                                 <strong>Overall Rating</strong>
                                 <div>
-                                    <span>4.5</span>
-                                    <i className="bi bi-star-fill"></i>
+                                    <span>{averate}</span>
+                                    <i className="bi bi-star-fill mx-2"></i>
                                 </div>
                             </div>
                         </div>
@@ -144,8 +223,8 @@ export default function ProductReviewComponent({ id }) {
                                         <Rating initialValue={item.rate} readonly={true} size={25} />
                                         <p>{item.description}</p>
                                         <div className="product-review-aut">
-                                        <strong>{item.consumername}</strong>
-                                        <p>{moment(item.createdAt).format('LL')}</p>
+                                            <strong>{item.consumername}</strong>
+                                            <p>{moment(item.createdAt).format('LL')}</p>
                                         </div>
                                     </div>
                                 </div>

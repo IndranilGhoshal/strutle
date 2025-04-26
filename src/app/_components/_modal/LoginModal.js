@@ -1,13 +1,15 @@
 "use client"
-import { consumerloginapi, consumersignupApi } from '@/app/lib/apiService';
-import { hideLoader, setLocalStorageData, showLoader } from '@/app/lib/common';
+import { AppContext } from '@/app/consumer/layout';
+import { cartapi, consumerloginapi, consumersignupApi } from '@/app/lib/apiService';
+import { getLocalStorageData, hideLoader, setLocalStorageData, showLoader } from '@/app/lib/common';
 import Image from 'next/image';
-import React, { useRef, useEffect, useState } from 'react'
+import React, { useRef, useEffect, useState, useContext } from 'react'
 import { Modal } from 'react-bootstrap';
 import OtpInput from "react-otp-input";
 
 export default function LoginModal({ onMessage, setUser }) {
-
+    const { setUserImage } = useContext(AppContext);
+    const { setCartCount } = useContext(AppContext);
     useEffect(() => {
         clearTimer(getDeadTime());
     }, [])
@@ -95,7 +97,7 @@ export default function LoginModal({ onMessage, setUser }) {
 
     const reotpsent = async () => {
         showLoader()
-        let response = await consumerloginapi({ phone,reotpsend:true })
+        let response = await consumerloginapi({ phone, reotpsend: true })
         if (response.success) {
             hideLoader()
             onMessage(response.message, true)
@@ -106,30 +108,32 @@ export default function LoginModal({ onMessage, setUser }) {
             hideLoader()
             onMessage(response.message, false)
         }
-      }
+    }
 
-      const sentOtp = async () => {
+    const sentOtp = async () => {
         let err = 0
         setError(false)
         if (!otp) {
             setError(true)
             err++
         }
-        if (otp && otp.length<6) {
+        if (otp && otp.length < 6) {
             setError(true)
             err++
         }
         if (err == 0) {
             showLoader()
-            let response = await consumerloginapi({ otp,otpsend:true })
+            let response = await consumerloginapi({ otp, otpsend: true })
             if (response.success) {
                 const { result } = response;
                 delete result.password;
+                setUserImage(result.image)
                 setLocalStorageData("consumer", result)
                 setUser(result)
                 setotpdiv(true)
                 handleClose()
                 setTimer('00:00')
+                getcartdata()
                 onMessage(response.message, true)
                 hideLoader()
             } else {
@@ -137,11 +141,20 @@ export default function LoginModal({ onMessage, setUser }) {
                 onMessage(response.message, false)
             }
         }
-      }
+    }
 
-      const phoneChange = async () =>{
+    const getcartdata = async () => {
+        let response = await cartapi({ mstconsumerid: getLocalStorageData('consumer')?._id, cartcount: true })
+        if (response.success) {
+            setCartCount(response.result)
+        } else {
+            setCartCount(0)
+        }
+    }
+
+    const phoneChange = async () => {
         showLoader()
-        let response = await consumerloginapi({ phone,otpexpired:true })
+        let response = await consumerloginapi({ phone, otpexpired: true })
         if (response.success) {
             hideLoader()
             setPhone('')
@@ -152,7 +165,7 @@ export default function LoginModal({ onMessage, setUser }) {
             onMessage(response.message, false)
             setotpdiv(true)
         }
-      }
+    }
 
 
 
@@ -203,7 +216,7 @@ export default function LoginModal({ onMessage, setUser }) {
                                 <div className="login-mod-right">
                                     <button type="button" className="close-button" data-bs-dismiss="modal" aria-label="Close" onClick={() => { setShow(false); setotpdiv(false) }}><i className="bi bi-x-lg"></i></button>
                                     <h3>Verify OTP</h3>
-                                    <p className="log-mesg">Enter the six digit OTP sent to +91-{phone} <button className="btn btn-change" onClick={()=>{phoneChange()}}>Change</button></p>
+                                    <p className="log-mesg">Enter the six digit OTP sent to +91-{phone} <button className="btn btn-change" onClick={() => { phoneChange() }}>Change</button></p>
                                     <div className="otp-div">
                                         <OtpInput
                                             value={otp}
@@ -237,14 +250,14 @@ export default function LoginModal({ onMessage, setUser }) {
                                     {
                                         error && phone && <div className='input-error'>Please enter valid otp.</div>
                                     }
-                                    <button className="btn btn-sent" onClick={()=>{sentOtp()}}>Verify OTP</button>
+                                    <button className="btn btn-sent" onClick={() => { sentOtp() }}>Verify OTP</button>
                                     <div className="verfy-otp-msg">
                                         <span>{timer}</span>
                                         {
                                             timer == '00:00' ?
-                                            <p className="ddnt-rcv-cod">Didn’t received your code? <a onClick={()=>{reotpsent()}}>Resend code</a></p>
-                                            :
-                                            <></>
+                                                <p className="ddnt-rcv-cod">Didn’t received your code? <a onClick={() => { reotpsent() }}>Resend code</a></p>
+                                                :
+                                                <></>
                                         }
                                     </div>
                                     <p className="trm-cond">By signing in, I agree to <a href="">Terms & Conditions</a>, and

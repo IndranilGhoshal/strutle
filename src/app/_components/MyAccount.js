@@ -14,6 +14,7 @@ import OrderComponent from './OrderComponent';
 import ManageAddressComponent from './ManageAddressComponent';
 import AddAddressModal from './_modal/AddAddressModal';
 import OrderListSkeleton from './_skeleton/OrderListSkeleton';
+import GiftListComponent from './GiftListComponent';
 
 export default function MyAccount() {
     const { setUserImage } = useContext(AppContext);
@@ -31,7 +32,7 @@ export default function MyAccount() {
     const [isLoadOrder, setIsLoadOrder] = useState(false)
 
     const [orderList, setOrderList] = useState([])
-    const [limitorderList, setlimitorderList] = useState('10')
+    const [limitorderList, setlimitorderList] = useState('5')
     const [pageorderList, setPageorderList] = useState(0)
     const [offsetorderList, setoffsetorderList] = useState('0')
     const [orderSearch, setorderSearch] = useState('')
@@ -101,7 +102,7 @@ export default function MyAccount() {
         let results = await uploadImageApi(data)
         setUserImage(results.fileName)
         if (results.success) {
-            let response = await consumeruserapi({ id: getLocalStorageData('consumer')._id, image: results.fileName, uploadimage: true })
+            let response = await consumeruserapi({ id: getLocalStorageData('consumer')?._id, image: results.fileName, uploadimage: true })
             if (response.success) {
                 hideLoader()
                 let r = await consumeruserapi({ id: getLocalStorageData('consumer')?._id, details: true })
@@ -124,7 +125,7 @@ export default function MyAccount() {
 
     const getFavouriteData = async (l, s) => {
         showLoader()
-        let data = { mstconsumerid: getLocalStorageData('consumer')._id, limit: l, skip: s, favouritelist: true }
+        let data = { mstconsumerid: getLocalStorageData('consumer')?._id, limit: l, skip: s, favouritelist: true }
         let response = await favouriteapi(data)
         if (response.success) {
             const { result, listlength } = response;
@@ -155,7 +156,7 @@ export default function MyAccount() {
 
     const addTofavoruite = async (item) => {
         showLoader()
-        let data = { mstconsumerid: getLocalStorageData('consumer')._id, mstproductid: item._id, status: "1", addfavourite: true }
+        let data = { mstconsumerid: getLocalStorageData('consumer')?._id, mstproductid: item._id, status: "1", addfavourite: true }
         let response = await favouriteapi(data)
         if (response.success) {
             getFavouriteData(limitfavouriteList, offsetfavouriteList)
@@ -168,7 +169,7 @@ export default function MyAccount() {
 
     const getOrderData = async (l, s, o) => {
         showLoader()
-        let data = { mstconsumerid: getLocalStorageData('consumer')._id, limit: l, skip: s, search: o, listorder: true }
+        let data = { mstconsumerid: getLocalStorageData('consumer')?._id, limit: l, skip: s, search: o, listorder: true }
         let response = await orderapi(data)
         if (response.success) {
             const { result, listlength } = response;
@@ -777,62 +778,7 @@ export default function MyAccount() {
                                     </div>
                                     {/* Gift Card */}
                                     <div className="tab-pane fade" id="my-giftcrd" role="tabpanel" aria-labelledby="my-giftcrd-tab" tabIndex="0">
-                                        <div className="my-giftcrd-top">
-                                            <div className="giftcrd-top">
-                                                <ul className="nav nav-tabs new-tab-div" id="myTab" role="tablist">
-                                                    <li className="nav-item" role="presentation">
-                                                        <button className="nav-link active" id="tab1-tab" data-bs-toggle="tab" data-bs-target="#tab1-tab-pane"
-                                                            type="button" role="tab" aria-controls="tab1-tab-pane" aria-selected="true">Received Gift
-                                                            Cards</button>
-                                                    </li>
-                                                    <li className="nav-item" role="presentation">
-                                                        <button className="nav-link" id="tab2-tab" data-bs-toggle="tab" data-bs-target="#tab2-tab-pane"
-                                                            type="button" role="tab" aria-controls="tab2-tab-pane" aria-selected="false">Send Gift
-                                                            Cards</button>
-                                                    </li>
-                                                </ul>
-                                                <div className="buy-gift"><button className="buy-gift-card">Buy Gift Card</button></div>
-                                            </div>
-                                            <div className="tab-content mt-4" id="myTabContent">
-                                                <div className="tab-pane fade show active" id="tab1-tab-pane" role="tabpanel" aria-labelledby="tab1-tab"
-                                                    tabIndex="0">
-                                                    <div className="gift-lists">
-                                                        <ul>
-                                                            <li>
-                                                                <a href="">
-                                                                    <Image
-                                                                        src={'/assets/img/gift-card.png'}
-                                                                        width={100}
-                                                                        height={100}
-                                                                        alt='logo'
-                                                                    />
-                                                                </a>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                </div>
-                                                <div className="tab-pane fade" id="tab2-tab-pane" role="tabpanel" aria-labelledby="tab2-tab" tabIndex="0">
-                                                    <div className="gift-lists">
-                                                        <ul>
-                                                            <li>
-                                                                <a href="">
-                                                                    <Image
-                                                                        src={'/assets/img/gift-card.png'}
-                                                                        width={100}
-                                                                        height={100}
-                                                                        alt='logo'
-                                                                    />
-                                                                </a>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="my-giftcrd">
-                                            <div className="my-giftcrd-l"></div>
-                                            <div className="my-giftcrd-r"></div>
-                                        </div>
+                                        <GiftListComponent />
                                     </div>
                                     {/* Coupons */}
                                     <div className="tab-pane fade" id="my-copun" role="tabpanel" aria-labelledby="my-copun-tab" tabIndex="0">

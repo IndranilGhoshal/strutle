@@ -1,0 +1,7 @@
+{
+  "/_not-found/page": "app/_not-found/page.js",
+  "/api/consumer/product/route": "app/api/consumer/product/route.js",
+  "/api/consumer/category/route": "app/api/consumer/category/route.js",
+  "/api/consumer/cart/route": "app/api/consumer/cart/route.js",
+  "/consumer/page": "app/consumer/page.js"
+}

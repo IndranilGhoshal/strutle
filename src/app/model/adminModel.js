@@ -62,6 +62,43 @@ const roleModel = new mongoose.Schema({
 
 export const roleSchema = mongoose.models.mstroles || mongoose.model("mstroles", roleModel);
 
+const giftcardModel = new mongoose.Schema({
+    image:String,
+    title:String,
+    description:String,
+    status:String,
+    createdAt:String
+},
+{
+    timestamps:true
+});
+
+export const giftcardsSchema = mongoose.models.mstgiftcards || mongoose.model("mstgiftcards", giftcardModel);
+
+const giftcardimageModel = new mongoose.Schema({
+    mstgiftcardsid:String,
+    image:String,
+    status:String,
+    createdAt:String
+},
+{
+    timestamps:true
+});
+
+export const giftcardimagesSchema = mongoose.models.mstgiftcardimages || mongoose.model("mstgiftcardimages", giftcardimageModel);
+
+const giftcardamountModel = new mongoose.Schema({
+    mstgiftcardsid:String,
+    amount:String,
+    status:String,
+    createdAt:String
+},
+{
+    timestamps:true
+});
+
+export const giftcardamountsSchema = mongoose.models.mstgiftcardamounts || mongoose.model("mstgiftcardamounts", giftcardamountModel);
+
 
 const adminSubMenuModel = new mongoose.Schema({
     mstmenuid:String,
@@ -151,6 +188,7 @@ const sellerModel = new mongoose.Schema({
     phone:String,
     status:String,
     password:String,
+    storename:String,
     createdAt:String
 },
 {

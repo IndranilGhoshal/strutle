@@ -2,7 +2,7 @@
 import GeneratePassword from '@/app/api/_apiFunction/GeneratePassword'
 import { orderapi } from '@/app/lib/apiService'
 import { getLocalStorageData } from '@/app/lib/common'
-import { urlpath } from '@/app/lib/config'
+import { IMAGE_URL } from '@/app/lib/config'
 import React from 'react'
 export default function Razorpaypaymentinterface({ totalamount, paymentdescription, addressarray, makeorder }) {
 
@@ -66,7 +66,7 @@ export default function Razorpaypaymentinterface({ totalamount, paymentdescripti
             "currency": currency,
             "name": companyname,
             "description": paymentdescription,
-            "image": urlpath+"/assets/img/srutle-logo.png",
+            "image": IMAGE_URL+"srutle-logo.png",
             order_id: order_id,
             handler: async function (response) {
                 const data = {

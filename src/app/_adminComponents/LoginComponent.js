@@ -2,16 +2,13 @@
 import React, { useEffect, useState } from 'react'
 import { adminEvent, adminLoginApi } from '../lib/apiService';
 import { getLocalStorageData, getPassData, hideLoader, removeLocalStorageData, setLocalStorageData, setPassData, showLoader } from '../lib/common';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { ToastContainer, toast } from 'react-toastify';
 import Image from 'next/image';
 
 
 export default function LoginComponent() {
-
-
-
-
+    const searchparams = useSearchParams();
     const mailformat = "^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,6}$";
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -19,6 +16,8 @@ export default function LoginComponent() {
     const [validEmailError, setValidEmailError] = useState(false)
     const router = useRouter();
     const [passwordType, setPasswordType] = useState('password');
+    const search = searchparams.get('session')
+    const [isRemembered, setIsRemembered] = useState(false);
 
     useEffect(() => {
         if (getLocalStorageData('admin')?.isfirstlogin == "1") {
@@ -26,10 +25,18 @@ export default function LoginComponent() {
         } else if (getLocalStorageData('admin')?.isfirstlogin == "0") {
             router.push("/admin/accountpassword");
         } else {
+            if(search == "error"){
+                toast.error("Session is expire")
+            }
             router.push("/admin");
             if (getPassData()) {
                 toast.success(getPassData())
                 setPassData('')
+            }
+            if(getLocalStorageData('isRemembered')){
+                setEmail(getLocalStorageData('email'))
+                setPassword(getLocalStorageData('password'))
+                setIsRemembered(getLocalStorageData('isRemembered'))
             }
             hideLoader()
         }
@@ -78,12 +85,30 @@ export default function LoginComponent() {
         router.push(path);
     }
 
+    const setremember = () =>{
+        setError(false)
+        if(!isRemembered){
+            if (!email || !password) {
+                setError(true)
+                return false
+            }
+            setIsRemembered(true)
+            setLocalStorageData('isRemembered',true)
+            setLocalStorageData('email',email)
+            setLocalStorageData('password',password)
+        }else{
+            setIsRemembered(false)
+            removeLocalStorageData('isRemembered')
+            removeLocalStorageData('email')
+            removeLocalStorageData('password')
+        }
+    }
 
     return (
         <>
             <div className="login-wrapper">
                 <div className="d-flex justify-content-center mb-5">
-                    <img className="d-block mx-auto" src="assets/img/srutle-logo.png" />
+                    <Image className="d-block mx-auto" src={"/assets/img/srutle-logo.png"} width={250} height={100} alt='login' />
                 </div>
                 <div className="container-login p-0">
                     <div className="col-left">
@@ -123,18 +148,18 @@ export default function LoginComponent() {
                                     passwordType === 'password'
                                         ?
                                         <>
-                                            <button className="btn btn-vw" onClick={() => { setPasswordType("text") }}><i className="bi bi-eye-slash-fill"></i></button>
+                                            <button className="btn btn-vw" onClick={() => { setPasswordType("text") }}><i className="bi bi-eye-fill"></i></button>
                                         </>
                                         :
                                         <>
-                                            <button className="btn btn-vw" onClick={() => { setPasswordType("password") }}><i className="bi bi-eye-fill"></i></button>
+                                            <button className="btn btn-vw" onClick={() => { setPasswordType("password") }}><i className="bi bi-eye-slash-fill"></i></button>
                                         </>
                                 }
                             </p>
                             {
                                 error && !password && <div className='input-error'>Please enter password</div>
                             }
-                            
+                            <p className='inp_rem'><input type='checkbox' checked={isRemembered} value={isRemembered} onChange={()=>{setremember()}} /> <lable>Reminder Me</lable></p>
                             <div className="for-sign">
                                 <a onClick={() => { goto("/admin/forgotpassword") }}>Forgot Password?</a>
                                 <button onClick={() => { handleLogin() }} > Sign In</button>

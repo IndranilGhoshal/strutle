@@ -7,7 +7,7 @@ import React, { useEffect } from 'react'
 export default function page() {
     const router = useRouter();
     useEffect(()=>{
-    if(!getLocalStorageData('admin')._id){
+    if(!getLocalStorageData('admin')?._id){
       router.push("/admin");
     }else{
       let getPath = getLocalStorageData('pathName')

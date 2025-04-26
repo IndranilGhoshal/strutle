@@ -1,0 +1,14 @@
+{
+  "app/_components/BannerCarousel.js -> react-owl-carousel": {
+    "id": "app/_components/BannerCarousel.js -> react-owl-carousel",
+    "files": [
+      "static/chunks/_app-pages-browser_node_modules_react-owl-carousel_umd_OwlCarousel_js.js"
+    ]
+  },
+  "app/_components/CategoryCarousel.js -> react-owl-carousel": {
+    "id": "app/_components/CategoryCarousel.js -> react-owl-carousel",
+    "files": [
+      "static/chunks/_app-pages-browser_node_modules_react-owl-carousel_umd_OwlCarousel_js.js"
+    ]
+  }
+}

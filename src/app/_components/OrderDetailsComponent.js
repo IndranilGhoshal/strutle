@@ -1,133 +1,213 @@
+'use client'
 import Image from 'next/image'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
+import { getLocalStorageData, hideLoader, removeLocalStorageData, setLocalStorageData, showLoader } from '../lib/common'
+import { orderapi } from '../lib/apiService'
+import InvoiceModal from './_modal/InvoiceModal'
+import moment from 'moment'
+import { useRouter } from 'next/navigation'
+import OrderDetailsSkeleton from './_skeleton/OrderDetailsSkeleton'
 
-export default function OrderDetailsComponent() {
+export default function OrderDetailsComponent({ id }) {
+    const router = useRouter();
+    const [isLoad, setIsLoad] = useState(false)
+    const [productlist, setProductlist] = useState([])
+    const [totalamount, settotalamount] = useState('')
+    const [ordernumber, setordernumber] = useState('')
+    const [orderdate, setorderdate] = useState('')
+    const [paymenttype, setpaymenttype] = useState('')
+
+    const [consumeraddress, setconsumeraddress] = useState({})
+    const [subtotal, setSubTotal] = useState(0)
+    const [totaldiscount, setTotaldiscount] = useState(0)
+    const [couponamount, setCouponamount] = useState(0)
+    const [deliveryamount, setDeliveryamount] = useState(0)
+    const [totalorderamount, setTotalOrderamount] = useState(0)
+
+
+    useEffect(() => {
+        getorderdetails()
+    }, [])
+    const getorderdetails = async () => {
+        showLoader()
+        let data = { id: id, mstconsumerid: getLocalStorageData('consumer')._id, details: true }
+        let response = await orderapi(data)
+        if (response.success) {
+            let { result } = response
+            setProductlist(result.product)
+            settotalamount(result.totalamount)
+            setconsumeraddress(result.consumeraddress)
+            setorderdate(result.orderdate)
+            setordernumber(result._id)
+            setpaymenttype(result.paymenttype)
+            getprice(id)
+            hideLoader()
+        } else {
+            setProductlist([])
+            settotalamount(0)
+            setconsumeraddress({})
+            setorderdate('')
+            setordernumber('')
+            setpaymenttype('')
+            hideLoader()
+        }
+    }
+
+    const getprice = async (order) => {
+        showLoader()
+        let data = { mstorderid: order, pricesummary: true }
+        let response = await orderapi(data)
+        if (response.success) {
+            let { result } = response
+            setSubTotal(result.subtotal)
+            setTotaldiscount(result.totaldiscount)
+            setCouponamount(result.couponamount)
+            setDeliveryamount(result.deliveryamount)
+            setTotalOrderamount(result.totalamount)
+            setIsLoad(true)
+            hideLoader()
+        } else {
+            setSubTotal(0)
+            setTotaldiscount(0)
+            setCouponamount(0)
+            setDeliveryamount(0)
+            setTotalOrderamount(0)
+            setIsLoad(true)
+            hideLoader()
+        }
+    }
+
+    const goto = (path) => {
+        showLoader()
+        router.push("/consumer" + path)
+        removeLocalStorageData("pathName")
+        setLocalStorageData('pathName', path)
+    }
+
     return (
         <>
-            <div className="order-details padding">
-                <div className="order-details-hed">
-                    <strong>Order Details</strong>
-                    <button className="btn btn-cncle" data-bs-toggle="modal" data-bs-target="#cancelorder">Cancel Order</button>
-                </div>
-                <div className="order-details-top">
-                    <div className="details-top-lft">
-                        <div className="details-top-1">
-                            <div className="details-top-box">
-                                <h4>Order Summary</h4>
-                                <ul>
-                                    <li><span>Subtotal</span><strong>₹4,089</strong></li>
-                                    <li><span>Discount (-20%)</span><strong className="text-green">₹4,089</strong></li>
-                                    <li><span>Coupon Saving</span><strong className="text-green">₹4,089</strong></li>
-                                    <li><span>Delivery Fee</span><strong className="txt-u">₹49</strong></li>
-                                </ul>
-                                <div className="pricsum-pric">
-                                    <p><span>Order Total</span><strong>₹20,520</strong></p>
+            {
+                isLoad ?
+                    <>
+                        <div className="bred-cm">
+                            <ul>
+                                <li className="bred-cm-curr cp" onClick={() => { goto('/') }}>Home</li>
+                                <li><i className="bi bi-chevron-right"></i></li>
+                                <li className="bred-cm-curr cp" onClick={() => { goto('/myaccount?tab=my-order-tab') }}>Order</li>
+                                <li><i className="bi bi-chevron-right"></i></li>
+                                <li className="bred-cm-it not-cp">Order Details</li>
+                            </ul>
+                        </div>
+                        <div className="order-details padding">
+                            <div className="order-details-hed">
+                                <strong>Order Details</strong>
+                                {/* <button className="btn btn-cncle" data-bs-toggle="modal" data-bs-target="#cancelorder">Cancel Order</button> */}
+                            </div>
+                            <div className="order-details-top">
+                                <div className="details-top-lft">
+                                    <div className="details-top-1">
+                                        <div className="details-top-box">
+                                            <h4>Order Summary</h4>
+                                            <ul>
+                                                <li><span>Subtotal</span><strong>₹{subtotal}</strong></li>
+                                                <li><span>Discount</span><strong className="text-green">₹{totaldiscount}</strong></li>
+                                                <li><span>Coupon Saving</span><strong className="text-green">₹{couponamount}</strong></li>
+                                                <li><span>Delivery Fee</span><strong className="txt-u">₹{deliveryamount}</strong></li>
+                                            </ul>
+                                            <div className="pricsum-pric">
+                                                <p><span>Order Total</span><strong>₹{totalorderamount}</strong></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="details-top-2">
+                                        <ul>
+                                            <li>Order ID: <strong>{ordernumber}</strong></li>
+                                            <li>Order Date: <strong>{moment(orderdate).format('LL')}</strong></li>
+                                            <li>Payment Methods: <strong>{paymenttype}</strong></li>
+                                            <li>Invoice <span>
+                                                <InvoiceModal
+                                                    id={id}
+                                                    productlist={productlist}
+                                                    getInvoice={getorderdetails}
+                                                    totalamount={totalamount}
+                                                    consumeraddress={consumeraddress}
+                                                    ordernumber={ordernumber}
+                                                    orderdate={orderdate}
+                                                /></span></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div className="details-top-rit ">
+                                    <div className="details-top-rit-lists">
+                                        <h4><u>Shipping Address</u></h4>
+                                        <h4>{consumeraddress.consumer}</h4>
+                                        <ul>
+                                            <li>{consumeraddress.locality + ", " + consumeraddress.building}</li>
+                                            <li>{consumeraddress.district + ", " + consumeraddress.state}</li>
+                                            <li>Pin Code: {consumeraddress.pincode}</li>
+                                            <li>Mobile : {consumeraddress.phone}</li>
+                                        </ul>
+                                    </div>
+                                    <div className="details-top-rit-lists">
+                                        <h4><u>Billing Address</u></h4>
+                                        <h4>{consumeraddress.consumer}</h4>
+                                        <ul>
+                                            <li>{consumeraddress.locality + ", " + consumeraddress.building}</li>
+                                            <li>{consumeraddress.district + ", " + consumeraddress.state}</li>
+                                            <li>Pin Code: {consumeraddress.pincode}</li>
+                                            <li>Mobile : {consumeraddress.phone}</li>
+                                        </ul>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div className="details-top-2">
-                            <ul>
-                                <li>Order ID: <strong>#1234567889</strong></li>
-                                <li>Order Date: <strong>14 October 2024</strong></li>
-                                <li>Payment Methods: <strong>BHIM UPI</strong></li>
-                                <li>Invoice <span>Download Invoice <i className="bi bi-chevron-down"></i></span></li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div className="details-top-rit ">
-                        <div className="details-top-rit-lists">
-                            <h4>Shipping Address</h4>
-                            <h4>Christian Tiegland</h4>
-                            <ul>
-                                <li>2118 Thornridge Cir. Syracuse, New York</li>
-                                <li>Connecticut 35624</li>
-                                <li>Pin Code: 743144</li>
-                                <li>Mobile : (209) 555-0104</li>
-                            </ul>
-                        </div>
-                        <div className="details-top-rit-lists">
-                            <h4>Billing Address</h4>
-                            <h4>Christian Tiegland</h4>
-                            <ul>
-                                <li>2118 Thornridge Cir. Syracuse, New York</li>
-                                <li>Connecticut 35624</li>
-                                <li>Pin Code: 743144</li>
-                                <li>Mobile : (209) 555-0104</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-                <div className="order-details-btn-sec">
+                            <div className="order-details-btn-sec">
 
-                    <div>
-                        <div className="order-details-btn">
-                            <div className="details-btn-lft">
-                                <div className="details-btn-lft-img"><Image src={"/assets/img/resel.png"} width={100} height={100} alt='no' /></div>
-                                <div className="details-btn-lft-txt">
-                                    <p className="txt-long">Lorem Ipsum is simply dummy text of the printing and dolor sit doler sit lorem ipsum
-                                        Lorem Ipsum is simply
-                                        dummy text of the printing and dolor sit doler sit lorem ipsum </p>
-                                    <ul>
-                                        <li>Color: <strong>White</strong></li>
-                                        <li>Size: <strong>Xll</strong></li>
-                                    </ul>
-                                    <p className="txt-selr"><strong>Seller:</strong> Robson Private Limited</p>
-                                    <p className="txt-pric">₹360.00</p>
-                                    <p className="txt-dlvry"><strong>Delivery today by 9:30pm</strong></p>
-                                    <button className="btn btn-rtn-exc">Return & Exchange</button>
+                                <div>
+                                    {
+                                        productlist.map((obj, i) => (
+                                            <div key={i} className="order-details-btn">
+                                                <div className="details-btn-lft">
+                                                    <div className="details-btn-lft-img"><Image src={'/upload/' + obj.productimage} width={100} height={100} alt='no' style={{ display: "flex", margin: "auto" }} /></div>
+                                                    <div className="details-btn-lft-txt">
+                                                        <p className="txt-long">{obj.productname}</p>
+                                                        <ul>
+                                                            <li>Color: <strong>{obj.color}</strong></li>
+                                                            <li>Quantity: <strong>{obj.quantity}</strong></li>
+                                                        </ul>
+                                                        <p className="txt-selr"><strong>Seller:</strong> {obj.seller}</p>
+                                                        <p className="txt-pric">₹{obj.productnetamount}</p>
+                                                        <p className="txt-dlvry"><strong>Delivery {moment(obj.deliveryat).format('LL')}</strong></p>
+                                                        {
+                                                            obj.orderproductdeliveredstatus == "1" ? 
+                                                            <button className="btn btn-rtn-exc mb-2" onClick={() => { goto('/return') }}>Return & Exchange</button> : <></>
+                                                        }
+                                                        
+                                                    </div>
+                                                </div>
+                                                <div className="details-btn-rit">
+                                                    <div className="ordr-trk">
+                                                        <ul>
+                                                            <li className={`${obj.orderproductconfirmedstatus == "1" ? "active" : ""}`}><strong>Order Confirmation</strong> <span>{moment(obj.orderproductconfirmeddatetime).format('LL')}</span></li>
+                                                            <li className={`${obj.orderproductshippingstatus == "1" ? "active" : ""}`}><strong>Shipped</strong> <span>{moment(obj.orderproductshippingdatetime).format('LL')}</span></li>
+                                                            <li className={`${obj.orderproductoutofdeliverystatus == "1" ? "active" : ""}`}><strong>Out for Delivery</strong> <span>{moment(obj.orderproductoutofdeliverydatetime).format('LL')}</span></li>
+                                                            <li className={`${obj.orderproductdeliveredstatus == "1" ? "active" : ""}`}><strong>Delivered</strong> <span>{moment(obj.orderproductdelivereddatetime).format('LL')}</span></li>
+                                                        </ul>
+                                                    </div>
+                                                    <div className="ordr-trk-txt">
+                                                        <p>Tracking ID : <span>{obj.trackingid}</span></p>
+                                                    </div>
+                                                    <div className="ordr-trk-hlp"><a href="">Help & Support</a></div>
+                                                </div>
+                                            </div>
+                                        ))
+                                    }
                                 </div>
-                            </div>
-                            <div className="details-btn-rit">
-                                <div className="ordr-trk">
-                                    <ul>
-                                        <li><strong>Order Confirmation</strong> <span>Mon, 25th Oct</span></li>
-                                        <li><strong>Shipped</strong> <span>Mon, 25th Oct</span></li>
-                                        <li><strong>Out for Delivery</strong> <span>Mon, 25th Oct</span></li>
-                                        <li><strong>Delivered</strong> <span>Wed, 25th Dec</span></li>
-                                    </ul>
-                                </div>
-                                <div className="ordr-trk-txt">
-                                    <p>Tracking ID : <span>#123456789021455</span></p>
-                                </div>
-                                <div className="ordr-trk-hlp"><a href="">Help & Support</a></div>
                             </div>
                         </div>
-                        <div className="order-details-btn">
-                            <div className="details-btn-lft">
-                                <div className="details-btn-lft-img"><Image src={"/assets/img/resel.png"} width={100} height={100} alt='no' /></div>
-                                <div className="details-btn-lft-txt">
-                                    <p className="txt-long">Lorem Ipsum is simply dummy text of the printing and dolor sit doler sit lorem ipsum
-                                        Lorem Ipsum is simply
-                                        dummy text of the printing and dolor sit doler sit lorem ipsum </p>
-                                    <ul>
-                                        <li>Color: <strong>White</strong></li>
-                                        <li>Size: <strong>Xll</strong></li>
-                                    </ul>
-                                    <p className="txt-selr"><strong>Seller:</strong> Robson Private Limited</p>
-                                    <p className="txt-pric">₹360.00</p>
-                                    <p className="txt-dlvry"><strong>Delivery today by 9:30pm</strong></p>
-                                    <button className="btn btn-rtn-exc">Return & Exchange</button>
-                                </div>
-                            </div>
-                            <div className="details-btn-rit">
-                                <div className="ordr-trk">
-                                    <ul>
-                                        <li className="active"><strong>Order Confirmation</strong> <span>Mon, 25th Oct</span></li>
-                                        <li className="active"><strong>Shipped</strong> <span>Mon, 25th Oct</span></li>
-                                        <li className="active"><strong>Out for Delivery</strong> <span>Mon, 25th Oct</span></li>
-                                        <li className="active"><strong>Delivered</strong> <span>Wed, 25th Dec</span></li>
-                                    </ul>
-                                </div>
-                                <div className="ordr-trk-txt">
-                                    <p>Tracking ID : <span>#123456789021455</span></p>
-                                </div>
-                                <div className="ordr-trk-hlp"><a href="">Rate & Review Product</a> &nbsp; | &nbsp; <a href="">Help &
-                                    Support</a></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                    </>
+                    :
+                    <><OrderDetailsSkeleton /></>
+            }
         </>
     )
 }
