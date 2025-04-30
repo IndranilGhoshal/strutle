@@ -494,12 +494,12 @@ export default function GiftCardComponent() {
                                                         {/* Multiple Payment Service */}
                                                         <button
                                                             className="nav-link active"
-                                                            id="multi-payment-tab"
+                                                            id="multi-pay-tab"
                                                             data-bs-toggle="tab"
-                                                            data-bs-target="#multi-payment"
+                                                            data-bs-target="#mul-payment"
                                                             type="button"
                                                             role="tab"
-                                                            aria-controls="multi-payment"
+                                                            aria-controls="mul-payment"
                                                             aria-selected="true"
                                                         >
                                                             <Image src={"/assets/img/multiple-payment.png"} width={100} height={100} alt='pi' />
@@ -512,10 +512,9 @@ export default function GiftCardComponent() {
                                             </div>
                                             <div className="myaccnt-right">
                                                 <div className="tab-content" id="nav-tabContent">
-                                                    <div className="tab-pane fade show active" id="multi-payment" role="tabpanel" aria-labelledby="multi-payment-tab"
+                                                    <div className="tab-pane fade show active" id="mul-payment" role="tabpanel" aria-labelledby="multi-pay-tab"
                                                         tabIndex="0">
                                                         <div className="upi-dv">
-                                                            <div className='py-txt mb-3'><Image src={"/assets/img/razorpay-icon.png"} width={30} height={30} alt='pi' /><h4>Razor Pay</h4></div>
                                                             <p>For safe, contactless and hassle free delivery, pay using card/wallet/netbanking</p>
                                                             <RazorpaypaymentinterfaceGiftCard totalamount={totalamount} paymentdescription={paymentdescription} makepayment={makepayment} />
                                                         </div>

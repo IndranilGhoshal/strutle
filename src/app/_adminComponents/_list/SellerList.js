@@ -91,12 +91,12 @@ export default function SellerList({
                                                             :
                                                             <>
                                                                 {
-                                                                    getNameFirstLetter(item.firstname)
+                                                                    getNameFirstLetter(item.name)
                                                                 }
                                                             </>
                                                     }
                                                 </span>
-                                                {item.firstname + " " + item.lastname}
+                                                {item.name}
                                             </td>
                                             <td align="left">{item.email}</td>
                                             <td align="left">{moment(item.createdAt).format('MMMM Do YYYY, h:mm:ss a')}</td>

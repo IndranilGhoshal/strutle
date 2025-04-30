@@ -1,6 +1,6 @@
 "use client"
 import { AppContext } from '@/app/consumer/layout';
-import { cartapi, consumerloginapi, consumersignupApi } from '@/app/lib/apiService';
+import { cartapi, consumerloginapi, consumersignupApi, shippingaddressapi } from '@/app/lib/apiService';
 import { getLocalStorageData, hideLoader, setLocalStorageData, showLoader } from '@/app/lib/common';
 import Image from 'next/image';
 import React, { useRef, useEffect, useState, useContext } from 'react'
@@ -8,8 +8,7 @@ import { Modal } from 'react-bootstrap';
 import OtpInput from "react-otp-input";
 
 export default function LoginModal({ onMessage, setUser }) {
-    const { setUserImage } = useContext(AppContext);
-    const { setCartCount } = useContext(AppContext);
+    const { setUserImage, setCartCount, setDeliveryAddress, setPincodeAddress } = useContext(AppContext);
     useEffect(() => {
         clearTimer(getDeadTime());
     }, [])
@@ -134,6 +133,7 @@ export default function LoginModal({ onMessage, setUser }) {
                 handleClose()
                 setTimer('00:00')
                 getcartdata()
+                getdeliverydata()
                 onMessage(response.message, true)
                 hideLoader()
             } else {
@@ -164,6 +164,22 @@ export default function LoginModal({ onMessage, setUser }) {
             hideLoader()
             onMessage(response.message, false)
             setotpdiv(true)
+        }
+    }
+
+    const getdeliverydata = async () => {
+        let response = await shippingaddressapi({ mstconsumerid: getLocalStorageData('consumer')?._id, addresslist: true })
+        if (response.success) {
+            let { result } = response;
+            for (let r of result) {
+                if (r.isdefault) {
+                    setPincodeAddress(r.pincode)
+                    setDeliveryAddress(r.district)
+                }
+            }
+        } else {
+            setPincodeAddress('')
+            setDeliveryAddress('')
         }
     }
 

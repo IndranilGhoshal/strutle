@@ -10,6 +10,7 @@ import { AppContext } from '../consumer/layout'
 import moment from 'moment'
 import ManageAddressComponent from './ManageAddressComponent'
 import Razorpaypaymentinterface from './_paymentinterfaces/Razorpaypaymentinterface'
+import { Modal } from 'react-bootstrap'
 
 export default function CartComponent() {
     const { setCartCount } = useContext(AppContext);
@@ -39,6 +40,9 @@ export default function CartComponent() {
 
     const search = searchparams.get('type')
 
+
+    const [show, setShow] = useState(false);
+    const handleClose = () => setShow(false);
 
     useEffect(() => {
         if (getLocalStorageData('consumer')?._id) {
@@ -309,7 +313,7 @@ export default function CartComponent() {
                     _id: result._id,
                     productquantity: 1,
                     productmrp: 1 * Number(result.productmrp),
-                    productnetamount: Number(result.productdiscount) !== 0 ? 1 * ((Number(result.productdiscount) / 100) * Number(result.productmrp)):Number(result.productmrp),
+                    productnetamount: Number(result.productdiscount) !== 0 ? 1 * ((Number(result.productdiscount) / 100) * Number(result.productmrp)) : Number(result.productmrp),
                     productdiscount: Number(result.productdiscount)
                 }
                 parray.push(data)
@@ -335,7 +339,7 @@ export default function CartComponent() {
 
         let response = await orderapi(obj)
         if (response.success) {
-            if (search=="cart") {
+            if (search == "cart") {
                 let ptemp = producttemp
                 for (let [i, p] of ptemp.entries()) {
                     let res = await cartapi({ id: p._id, onorder: true })
@@ -348,15 +352,13 @@ export default function CartComponent() {
                         setStep("1")
                         getcartcountdata()
                         hideLoader()
-                        var element = document.getElementById("successorderbtn");
-                        element.click();
+                        setShow(true)
                     }
                 }
             } else {
                 setISearchLoad(false)
                 getbuynowpricedata()
-                var element = document.getElementById("successorderbtn");
-                element.click();
+                setShow(true)
                 hideLoader()
             }
         } else {
@@ -366,8 +368,7 @@ export default function CartComponent() {
     }
 
     const gotoorder = (path) => {
-        const image = document.getElementById('successorderbtncls');
-        image.click();
+        handleClose()
         setTimeout(() => {
             goto(path)
         }, 150);
@@ -402,9 +403,7 @@ export default function CartComponent() {
                         <div className="cart-page padding">
                             {
                                 isSearchLoad ?
-                                    <>
-
-                                    </>
+                                    <></>
                                     :
                                     <>
 
@@ -937,7 +936,6 @@ export default function CartComponent() {
                                                                                                             <div className="tab-pane fade show active" id="multi-payment" role="tabpanel" aria-labelledby="multi-payment-tab"
                                                                                                                 tabIndex="0">
                                                                                                                 <div className="upi-dv">
-                                                                                                                    <div className='py-txt mb-3'><Image src={"/assets/img/razorpay-icon.png"} width={30} height={30} alt='pi' /><h4>Razor Pay</h4></div>
                                                                                                                     <p>For safe, contactless and hassle free delivery, pay using card/wallet/netbanking</p>
                                                                                                                     <Razorpaypaymentinterface totalamount={totalamount} paymentdescription={paymentdescription} addressarray={addressarray} makeorder={makeorder} />
                                                                                                                 </div>
@@ -1100,26 +1098,25 @@ export default function CartComponent() {
                     <></>
             }
 
-            <a id="successorderbtn" data-bs-toggle="modal" data-bs-target="#successorder" style={{ display: "none" }} >Success</a>
-
-            <div className="modal fade" id="successorder" tabIndex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" data-bs-backdrop="static">
-                <div className="modal-dialog modal-md">
-                    <div className="modal-content">
-                        <div className="modal-body">
-                            <button id="successorderbtncls" style={{ display: "none" }} type="button" className="close-button abslt" data-bs-dismiss="modal" aria-label="Close"><i className="bi bi-x-lg"></i></button>
-                            <div className="success-ord">
-                                <div className="success-ord-inr">
-                                    <span><Image src={"/assets/img/verified-icn.png"} width={100} height={100} alt='nocart' /></span>
-                                    <strong>Your order has been<br />
-                                        placed successfully</strong>
-                                    <p>You can track order from <b>My Order</b> section</p>
-                                    <button className="btn btn-vw-ordr" onClick={() => { gotoorder('/myaccount?tab=my-order-tab') }} >View Order</button>
-                                </div>
-                            </div>
+            <Modal
+                show={show}
+                onHide={handleClose}
+                backdrop="static"
+                keyboard={false}
+            >
+                <Modal.Body style={{ padding: '10px' }}>
+                    <button id="successorderbtncls" onClick={()=>{handleClose()}} style={{ display: "none" }} type="button" className="close-button abslt" data-bs-dismiss="modal" aria-label="Close"><i className="bi bi-x-lg"></i></button>
+                    <div className="success-ord">
+                        <div className="success-ord-inr">
+                            <span><Image src={"/assets/img/verified-icn.png"} width={100} height={100} alt='nocart' /></span>
+                            <strong>Your order has been<br />
+                                placed successfully</strong>
+                            <p>You can track order from <b>My Order</b> section</p>
+                            <button className="btn btn-vw-ordr" onClick={() => { gotoorder('/myaccount?tab=my-order-tab') }} >View Order</button>
                         </div>
                     </div>
-                </div>
-            </div>
+                </Modal.Body>
+            </Modal>
         </>
     )
 }

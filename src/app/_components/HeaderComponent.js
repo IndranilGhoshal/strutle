@@ -6,22 +6,22 @@ import { toast, ToastContainer } from 'react-toastify'
 import { getLocalStorageData, hideLoader, opneLoginModal, removeLocalStorageData, setLocalStorageData, showLoader } from '../lib/common'
 import Dropdown from 'react-bootstrap/Dropdown';
 import { useRouter } from 'next/navigation'
-import { consumercategoryapi } from '../lib/apiService'
+import { consumercategoryapi, menuapi } from '../lib/apiService'
 import { AppContext } from '../consumer/layout'
 import AutocompleteSearch from './AutocompleteSearch'
+import DeliveyAddressModal from './_modal/DeliveyAddressModal'
 
 export default function HeaderComponent() {
-    const { userImage } = useContext(AppContext);
-    const { cartCount } = useContext(AppContext);
+    const { userImage, cartCount, setDeliveryAddress, setPincodeAddress } = useContext(AppContext);
     const [user, setUser] = useState({})
-    const [categorylist, setCategoryList] = useState([])
+    const [menulist, setMenuList] = useState([])
 
     useEffect(() => {
         let u = getLocalStorageData('consumer')
         if (u) {
             setUser(u)
         }
-        getCategoryData()
+        getMenuData()
     }, [])
 
     const router = useRouter()
@@ -34,11 +34,19 @@ export default function HeaderComponent() {
     }
     const goto = (path) => {
         showLoader()
-        if (path == "/myaccount?tab=my-favrot-tab" || "/myaccount?tab=my-order-tab" || "/myaccount?tab=personal-info-tab") {
+        if (path == "/myaccount?tab=my-favrot-tab" || 
+            "/myaccount?tab=my-order-tab" || 
+            "/myaccount?tab=personal-info-tab" || 
+            "/myaccount?tab=manage-addrs-tab"
+        ) {
             router.push('/')
         }
         setTimeout(() => {
-            router.push("/consumer" + path)
+            if(path == "/seller"){
+                router.push(path)
+            }else{
+                router.push("/consumer" + path)
+            }
         }, 100);
         removeLocalStorageData("pathName")
         setLocalStorageData('pathName', path)
@@ -46,8 +54,9 @@ export default function HeaderComponent() {
             "/myaccount?tab=my-favrot-tab" ||
             "/myaccount?tab=my-order-tab" ||
             "/myaccount?tab=personal-info-tab" ||
+            "/myaccount?tab=manage-addrs-tab" ||
             '/cart') {
-            getCategoryData()
+            getMenuData()
         }
     }
 
@@ -57,91 +66,23 @@ export default function HeaderComponent() {
         removeLocalStorageData("consumer")
         removeLocalStorageData("pathName")
         router.push("/consumer")
-        cartCount(0)
+        cartCount('0')
+        setDeliveryAddress('')
+        setPincodeAddress('')
         toast.success("User logout successfully!")
         hideLoader()
     }
 
-    const getCategoryData = async () => {
+    const getMenuData = async () => {
         showLoader()
         let data = { list: true }
-        let response = await consumercategoryapi(data)
+        let response = await menuapi(data)
         if (response.success) {
             const { result } = response;
-            let temp = result
-            let array = []
-            let pathname = getLocalStorageData('pathName')
-            if (pathname) {
-                const patharray = pathname.split("/");
-                let aid = patharray[2]
-                if (aid) {
-                    for (let a of temp) {
-                        let obj = {
-                            _id: a._id,
-                            name: a.name,
-                            active: false
-                        }
-                        if (obj._id == aid) {
-                            obj.active = true
-                        }
-                        array.push(obj)
-                    }
-                }
-                else {
-                    for (let t of temp) {
-                        let obj = {
-                            _id: t._id,
-                            name: t.name,
-                            active: false
-                        }
-                        array.push(obj)
-                    }
-                }
-            } else {
-                for (let t of temp) {
-                    let obj = {
-                        _id: t._id,
-                        name: t.name,
-                        active: false
-                    }
-                    array.push(obj)
-                }
-            }
-            hideLoader()
-            setCategoryList(array)
+            setMenuList(result)
         } else {
             hideLoader()
-            setCategoryList([])
-        }
-    }
-
-    const onClassChange = (index) => {
-        let tempo = [...categorylist]
-        let temp = []
-        for (let [ind, f] of tempo.entries()) {
-            let obj = {
-                _id: f._id,
-                name: f.name,
-                active: false
-            }
-            temp.push(obj)
-            if (ind === tempo.length - 1) {
-                let o = []
-                for (let [i, t] of temp.entries()) {
-                    let obj = {
-                        _id: t._id,
-                        name: t.name,
-                        active: false
-                    }
-                    if (i == index) {
-                        obj.active = true
-                        var element = document.getElementById("categoryactive" + t._id);
-                        element.classList.add("active");
-                    }
-                    o.push(obj)
-                }
-                setCategoryList(o)
-            }
+            setMenuList([])
         }
     }
 
@@ -167,12 +108,7 @@ export default function HeaderComponent() {
                             alt='logo'
                         />
                     </div>
-                    <div className="deliv-addrs">
-                        <i className="bi bi-geo-alt"></i>
-                        <div className="deliv-addrs-txts"><strong>Delivery to</strong>
-                            <p>Enter your location</p>
-                        </div>
-                    </div>
+                    <DeliveyAddressModal setDeliveryAddress={setDeliveryAddress} setPincodeAddress={setPincodeAddress} goto={goto} />
                     <div className="search-bar ">
                         <AutocompleteSearch />
                         <button className="btn btn-search"><i className="bi bi-search"></i></button>
@@ -196,7 +132,7 @@ export default function HeaderComponent() {
                             user?._id ?
                                 <></>
                                 :
-                                <a className="selersignin">Seller Login</a>
+                                <a className="selersignin" onClick={() => { goto('/seller') }}>Seller Login</a>
                         }
 
                         {
@@ -235,16 +171,72 @@ export default function HeaderComponent() {
                     </div>
                 </div>
                 <div className="head-menu">
-                    <div className="navigation" id="cssmenu">
-                        <ul>
+                    <nav className="navbar">
 
-                            {
-                                categorylist && categorylist.map((item, i) => (
-                                    <li key={i}><a id={"categoryactive" + item._id} onClick={() => { goto('/productlist/' + item._id), onClassChange(i) }} className={`${item.active ? "active" : ""}`} >{item.name}</a></li>
-                                ))
-                            }
-                        </ul>
-                    </div>
+                        <div className="burger" id="burger">
+                            <span className="burger-line"></span>
+                            <span className="burger-line"></span>
+                            <span className="burger-line"></span>
+                        </div>
+
+                        <div className="navbar-block" id="menu">
+                            <ul className="menu">
+                                {
+                                    menulist.length > 0 ?
+                                        <>
+                                            {
+                                                menulist.map((item, i) => (
+                                                    <li key={i} className="menu-item dropdown">
+                                                        <a className="menu-link">
+                                                            {item.category.categoryname}
+                                                        </a>
+
+                                                        {
+                                                            item.category.subcategory.length > 0 ?
+                                                                <>
+                                                                    <div className="dropdown-content">
+                                                                        <div className="dropdown-column">
+                                                                            {
+                                                                                item.category.subcategory.map((obj, index) => (
+                                                                                    <div className="dropdown-group" key={index}>
+                                                                                        <div className="dropdown-title">
+                                                                                            <span className="text-base font-medium">{obj.subcategoryname}</span>
+                                                                                        </div>
+                                                                                        <ul className="dropdown-items">
+                                                                                            {
+                                                                                                obj.producttype.length > 0 ?
+                                                                                                    <>
+                                                                                                        {
+                                                                                                            obj.producttype.map((data, ind) => (
+                                                                                                                <li key={ind}><a className="dropdown-link" onClick={() => { goto('/productlist/' + data.producttype + "?type=producttype") }}>{data.producttypename}</a></li>
+                                                                                                            ))
+                                                                                                        }
+                                                                                                    </>
+                                                                                                    :
+                                                                                                    <></>
+                                                                                            }
+                                                                                        </ul>
+                                                                                    </div>
+                                                                                ))
+                                                                            }
+                                                                        </div>
+                                                                    </div>
+                                                                </>
+                                                                :
+                                                                <>
+
+                                                                </>
+                                                        }
+
+
+                                                    </li>
+                                                ))
+                                            }
+                                        </> : <></>
+                                }
+                            </ul>
+                        </div>
+                    </nav>
                 </div>
             </div>
             <ToastContainer />

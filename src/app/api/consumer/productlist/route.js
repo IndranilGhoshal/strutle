@@ -1,8 +1,8 @@
 import mongoose from "mongoose";
 import { NextResponse } from "next/server";
 import { connectionStr } from "@/app/lib/db";
-import { favouritesSchema, productcolorvariantsvaluesSchema, productimageSchema, productlistSchema, productotherattributevaluesSchema, productreviewSchema, productSchema } from "@/app/model/consumerModal";
-import { subCategorySchema } from "@/app/model/adminModel";
+import { favouritesSchema, productcolorvariantsvaluesSchema, productimageSchema, productlistSchema, productotherattributesSchema, productotherattributevaluesSchema, productreviewSchema, productSchema } from "@/app/model/consumerModal";
+import { categorySchema, productTypesSchema, subCategorySchema } from "@/app/model/adminModel";
 
 export async function POST(request) {
     let payload = await request.json();
@@ -16,11 +16,28 @@ export async function POST(request) {
 
     //List
     if (payload.list) {
-        // Filter //
-        if (payload.categoryfiltteridarray.length>0) {
-            filter = { mstcategoryid: payload.mstcategoryid, mstsubcategoryid: {$in: payload.categoryfiltteridarray}, status: { $in: ['0'] } };
-        } else {
-            filter = { mstcategoryid: payload.mstcategoryid, status: { $in: ['0'] } };
+
+        if (payload.mstcategoryid) {
+            // Filter //
+            if (payload.categoryfiltteridarray.length > 0) {
+                filter = { mstcategoryid: payload.mstcategoryid, mstsubcategoryid: { $in: payload.categoryfiltteridarray }, status: { $in: ['0'] } };
+            } else {
+                filter = { mstcategoryid: payload.mstcategoryid, status: { $in: ['0'] } };
+            }
+        } else if (payload.mstsubcategoryid) {
+            // Filter //
+            if (payload.categoryfiltteridarray.length > 0) {
+                filter = { mstsubcategoryid: payload.mstsubcategoryid, mstsubcategoryid: { $in: payload.categoryfiltteridarray }, status: { $in: ['0'] } };
+            } else {
+                filter = { mstsubcategoryid: payload.mstsubcategoryid, status: { $in: ['0'] } };
+            }
+        } else if (payload.mstproducttypeid) {
+            // Filter //
+            if (payload.categoryfiltteridarray.length > 0) {
+                filter = { mstproducttypeid: payload.mstproducttypeid, mstsubcategoryid: { $in: payload.categoryfiltteridarray }, status: { $in: ['0'] } };
+            } else {
+                filter = { mstproducttypeid: payload.mstproducttypeid, status: { $in: ['0'] } };
+            }
         }
         // Sort //
         sortObj = {}
@@ -32,7 +49,7 @@ export async function POST(request) {
         let results = await productlistSchema.find(filter).sort(sortObj).limit(payload.limit).skip(payload.skip);
 
         let tempres = []
-        
+
         //Size    
         if (payload.sizefiltter && !payload.colorfiltter && !payload.ratingfiltter && !payload.discountfiltter && !payload.pricefiltter) {
             let resulttemp = results
@@ -110,8 +127,23 @@ export async function POST(request) {
                         if (discountedprice >= 501 && discountedprice <= 999) {
                             ft.push(temp)
                         }
-                    } else if (payload.pricefiltter == "Above 1000") {
-                        if (discountedprice >= 1000) {
+                    } else if (payload.pricefiltter == "1000 - 1499") {
+                        if (discountedprice >= 1000 && discountedprice <= 1499) {
+                            ft.push(temp)
+                        }
+                    }
+                    else if (payload.pricefiltter == "1500 - 1999") {
+                        if (discountedprice >= 1500 && discountedprice <= 1999) {
+                            ft.push(temp)
+                        }
+                    }
+                    else if (payload.pricefiltter == "2000 - 2999") {
+                        if (discountedprice >= 2000 && discountedprice <= 2999) {
+                            ft.push(temp)
+                        }
+                    }
+                    else if (payload.pricefiltter == "Above 3000") {
+                        if (discountedprice >= 3000) {
                             ft.push(temp)
                         }
                     }
@@ -273,13 +305,13 @@ export async function POST(request) {
                 }
                 fr.push(o)
             }
-            if(payload.sortdropdown == "Low to High"){
+            if (payload.sortdropdown == "Low to High") {
                 fr.sort((a, b) => a.netmrp - b.netmrp)
-            }else if(payload.sortdropdown == "High to Low"){
+            } else if (payload.sortdropdown == "High to Low") {
                 fr.sort((a, b) => b.netmrp - a.netmrp)
-            }else if(payload.sortdropdown == "Discount"){
+            } else if (payload.sortdropdown == "Discount") {
                 fr.sort((a, b) => a.discount - b.discount)
-            }else if(payload.sortdropdown == "Rating"){
+            } else if (payload.sortdropdown == "Rating") {
                 fr.sort((a, b) => b.averate - a.averate)
             }
             result = fr
@@ -340,7 +372,10 @@ export async function POST(request) {
                 { "value": "Under 299" },
                 { "value": "300 - 500" },
                 { "value": "501 - 999" },
-                { "value": "Above 1000" },
+                { "value": "1000 - 1499" },
+                { "value": "1500 - 1999" },
+                { "value": "2000 - 2999" },
+                { "value": "Above 3000" },
             ]
             obj.price = pco
             //discount
@@ -359,10 +394,183 @@ export async function POST(request) {
                 { "value": "4.0 and Above" },
             ]
             obj.rating = rco
+        }
+        else if (payload.mstsubcategoryid) {
+            //category
+            let subcategoryresults = await subCategorySchema.find({ _id: payload.mstsubcategoryid, status: { $in: ['0'] } });
+            if (subcategoryresults) {
+                obj.category = subcategoryresults
+            } else {
+                obj.category = []
+            }
+            //price 
+            let pco = [
+                { "value": "Under 299" },
+                { "value": "300 - 500" },
+                { "value": "501 - 999" },
+                { "value": "1000 - 1499" },
+                { "value": "1500 - 1999" },
+                { "value": "2000 - 2999" },
+                { "value": "Above 3000" },
+            ]
+            obj.price = pco
+            //discount
+            let dco = [
+                { "value": "9% and Below" },
+                { "value": "10% and Above" },
+                { "value": "30% and Above" },
+                { "value": "50% and Above" },
+            ]
+            obj.discount = dco
+            //rating
+            let rco = [
+                { "value": "1.0 and Above" },
+                { "value": "2.0 and Above" },
+                { "value": "3.0 and Above" },
+                { "value": "4.0 and Above" },
+            ]
+            obj.rating = rco
+        } 
+        else {
+            //category
+            let producttypefilter = await productTypesSchema.findOne({ _id: payload.mstproducttypeid, status: { $in: ['0'] } });
+            let subcategoryresults = await subCategorySchema.find({ _id: producttypefilter.mstsubcategoryid, status: { $in: ['0'] } });
+            if (subcategoryresults) {
+                obj.category = subcategoryresults
+            } else {
+                obj.category = []
+            }
+            //other attributes
+            let productresults = await productSchema.find({ mstproducttypeid: payload.mstproducttypeid, status: { $in: ['0'] } });
+            let fo = []
+            for (let t of productresults) {
+                let attribute = await productotherattributesSchema.find({ mstproductid: t._id, status: { $in: ['0'] } })
+                for (let a of attribute) {
+                    let attributevalue = await productotherattributevaluesSchema.find({ mstproductotherattributesid: a._id, status: { $in: ['0'] } })
+                    let val = []
+                    for (let att of attributevalue) {
+                        val.push(att.value)
+                    }
+                    let size = val.filter((item, index) => val.indexOf(item) === index);
+                    fo.push({ "value": a.labelname, array: size })
+                }
+            }
+            function uniqBy(a, key) {
+                return [
+                    ...new Map(
+                        a.map(x => [key(x), x])
+                    ).values()
+                ]
+            }
+            let b = uniqBy(fo, JSON.stringify)
+            function mergeAndRemoveDuplicates(arr) {
+                const merged = [];
+                const seen = {};
+                for (let i = 0; i < arr.length; i++) {
+                    const subArray = arr[i];
+                    for (let j = 0; j < subArray.array.length; j++) {
+                        const element = subArray.array[j];
+                        if (!seen[element]) {
+                            merged.push({name:subArray.value,value:element});
+                            seen[element] = true;
+                        }
+                    }
+                }
+                return merged;
+            }
+            const res = mergeAndRemoveDuplicates(b);
+            const groupBy = (x,f)=>x.reduce((a,b,i)=>((a[f(b,i,x)]||=[]).push(b),a),{});
+            obj.other = [groupBy(res,v => v.name)]
+            //color
+            let fco = []
+            for (let t of productresults) {
+                let attributesize = await productcolorvariantsvaluesSchema.find({ mstproductid: t._id })
+                let atemp = attributesize
+                for (let a of atemp) {
+                    fco.push(a.colorname)
+                }
+            }
+            let color = fco.filter((item, index) => fco.indexOf(item) === index);
+            if (productresults) {
+                obj.color = color
+            } else {
+                obj.color = []
+            }
+            //price 
+            let pco = [
+                { "value": "Under 299" },
+                { "value": "300 - 500" },
+                { "value": "501 - 999" },
+                { "value": "1000 - 1499" },
+                { "value": "1500 - 1999" },
+                { "value": "2000 - 2999" },
+                { "value": "Above 3000" },
+            ]
+            obj.price = pco
+            //discount
+            let dco = [
+                { "value": "9% and Below" },
+                { "value": "10% and Above" },
+                { "value": "30% and Above" },
+                { "value": "50% and Above" },
+            ]
+            obj.discount = dco
+            //rating
+            let rco = [
+                { "value": "1.0 and Above" },
+                { "value": "2.0 and Above" },
+                { "value": "3.0 and Above" },
+                { "value": "4.0 and Above" },
+            ]
+            obj.rating = rco
+        }
+        if (obj) {
             result = obj
             success = true
+            message = "Filter found"
+        } else {
+            success = false
+            message = "Filter not found"
         }
     }
-
+    else if (payload.bredcmdetails) {
+        let obj;
+        if (payload.mstcategoryid) {
+            let categoryresults = await categorySchema.findOne({ _id: payload.mstcategoryid, status: { $in: ['0'] } });
+            obj = {
+                category: categoryresults._id,
+                categoryname: categoryresults.name
+            }
+        } else if (payload.mstsubcategoryid) {
+            let subcategoryresults = await subCategorySchema.findOne({ _id: payload.mstsubcategoryid, status: { $in: ['0'] } });
+            let categoryresults = await categorySchema.findOne({ _id: subcategoryresults.mstcategoryid, status: { $in: ['0'] } });
+            obj = {
+                category: categoryresults._id,
+                categoryname: categoryresults.name,
+                subcategory: subcategoryresults._id,
+                subcategoryname: subcategoryresults.name
+            }
+        } else {
+            let producttyperesults = await productTypesSchema.findOne({ _id: payload.mstproducttypeid, status: { $in: ['0'] } });
+            let subcategoryresults = await subCategorySchema.findOne({ _id: producttyperesults.mstsubcategoryid, status: { $in: ['0'] } });
+            let categoryresults = await categorySchema.findOne({ _id: subcategoryresults.mstcategoryid, status: { $in: ['0'] } });
+            obj = {
+                category: categoryresults._id,
+                categoryname: categoryresults.name,
+                subcategory: subcategoryresults._id,
+                subcategoryname: subcategoryresults.name,
+                producttype: producttyperesults._id,
+                producttypename: producttyperesults.name
+            }
+        }
+        if (obj) {
+            result = obj
+            success = true
+            message = "bredcm found"
+        } else {
+            success = false
+            message = "bredcm not found"
+        }
+    }
     return NextResponse.json({ result, success, message, listlength })
 }

@@ -4,6 +4,8 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import '../../public/assets/css/admin-stylesheet.css'
 import '../../public/assets/css/bootstrap.min.css'
 import '../../public/assets/css/stylesheet.css'
+import '../../public/assets/css/seller-stylesheet.css'
+import Script from "next/script";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -41,8 +43,11 @@ export default function RootLayout({ children }) {
         </div>
 
         {children}
-        <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossOrigin="anonymous"></script>
+        <Script src="https://checkout.razorpay.com/v1/checkout.js" />
+        <Script 
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" 
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" 
+        crossOrigin="anonymous" />
       </body>
     </html>
   );

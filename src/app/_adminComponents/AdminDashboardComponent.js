@@ -4,14 +4,13 @@ import { getPassData, hideLoader, setPassData } from '../lib/common'
 import { toast, ToastContainer } from 'react-toastify'
 
 export default function AdminDashboardComponent() {
-    useEffect(()=>{
+    useEffect(() => {
         hideLoader()
-        if(getPassData()){
-            console.log("getPassData()",getPassData());
+        if (getPassData()) {
             toast.success(getPassData())
             setPassData('')
-          }
-    },[])
+        }
+    }, [])
     return (
         <>
             <div className="main-das-page">

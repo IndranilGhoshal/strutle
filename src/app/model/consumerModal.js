@@ -242,6 +242,7 @@ const orderproductsModel = new mongoose.Schema({
     orderproductmrp:String,
     orderproductnetamount:String,
     orderproductdiscount:String,
+    orderstatus:String,
     status:String,
     createdAt:String
 },

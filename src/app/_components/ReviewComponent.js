@@ -1,14 +1,31 @@
 'use client'
 import Image from 'next/image'
 import React, { useEffect } from 'react'
-import { hideLoader } from '../lib/common'
+import { hideLoader, removeLocalStorageData, setLocalStorageData, showLoader } from '../lib/common'
+import { useRouter } from 'next/navigation';
 
-export default function ReviewComponent() {
-    useEffect(()=>{
+export default function ReviewComponent({id}) {
+    const router = useRouter();
+    useEffect(() => {
         hideLoader()
-    },[])
+    }, [])
+    const goto = (path) => {
+        showLoader()
+        router.push("/consumer" + path)
+        removeLocalStorageData("pathName")
+        setLocalStorageData('pathName', path)
+    }
     return (
         <>
+            <div className="bred-cm">
+                <ul>
+                    <li className="bred-cm-curr cp" onClick={() => { goto('/') }}>Home</li>
+                    <li><i className="bi bi-chevron-right"></i></li>
+                    <li className="bred-cm-curr cp" onClick={() => { goto('/myaccount?tab=my-order-tab') }}>Order</li>
+                    <li><i className="bi bi-chevron-right"></i></li>
+                    <li className="bred-cm-it not-cp">Product Review</li>
+                </ul>
+            </div>
             <div className="product-review padding retrn-pge">
                 <div className="product-review-left">
                     <div className="product-review-left-inr">
@@ -26,7 +43,7 @@ export default function ReviewComponent() {
                                 <strong>Seller Private Limited</strong>
                                 <a href="">View Seller Profile</a>
                             </div>
-                            <div className="details-top-2">
+                            <div className="details-top-2 w-100">
                                 <ul>
                                     <li>Order ID: <strong>#1234567889</strong></li>
                                     <li>Order Date: <strong>14 October 2024</strong></li>

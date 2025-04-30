@@ -10,18 +10,14 @@
   background: transparent;
 }
 
-body {
+
+body#body.body-slide.body-pd {
   background: #f5f7fb;
   line-height: 20px;
   font-size: 14px;
   font-family: "Nunito Sans", serif;
   font-weight: 400;
   color: #212529;
-}
-
-body,
-.body-slide.body-pd {
-  background: #f5f7fb !important;
 }
 
 article,
@@ -1383,8 +1379,8 @@ main.content {
 }
 
 .sidebar-new {
-  max-width: 260px;
-  min-width: 260px;
+  max-width: 324px;
+  min-width: 324px;
   transition: all 500ms linear;
   background: #fff;
   padding: 0px;

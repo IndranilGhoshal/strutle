@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import { NextResponse } from "next/server";
 import { connectionStr } from "@/app/lib/db";
 import { cartSchema, consumershippingaddressSchema, orderpaymentsSchema, orderproductshippingstatusSchema, orderproductsSchema, ordersSchema, productcolorvariantsvaluesSchema, productimageSchema, productSchema, sellerSchema } from "@/app/model/consumerModal";
+import { sellerbusinesdetailsSchema } from "@/app/model/sellerModal";
 const Razorpay = require("razorpay");
 
 export async function POST(request) {
@@ -39,6 +40,7 @@ export async function POST(request) {
                     orderproductmrp: p.productmrp,
                     orderproductnetamount: p.productnetamount,
                     orderproductdiscount: p.productdiscount,
+                    orderstatus:"pending",
                     status: "0",
                 }
                 const orderprodres = new orderproductsSchema(orderproductobj);
@@ -47,7 +49,7 @@ export async function POST(request) {
                 let ordershippingobj = {
                     mstorderid: ors._id,
                     mstproductid: p._id,
-                    orderproductconfirmedstatus: "1",
+                    orderproductconfirmedstatus: "0",
                     orderproductconfirmeddatetime: new Date(),
                     orderproductshippingstatus: "0",
                     orderproductshippingdatetime: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000),
@@ -156,6 +158,7 @@ export async function POST(request) {
                     let color = await productcolorvariantsvaluesSchema.findOne({ mstproductid: product._id, status: { $in: ['0'] } })
                     let shiping = await orderproductshippingstatusSchema.findOne({ mstorderid: t._id, status: { $in: ['0'] } })
                     let data = {
+                        _id:product._id,
                         productimage: image.productimage,
                         productname: product.productname,
                         producttitledescription: product.producttitledescription,
@@ -226,6 +229,7 @@ export async function POST(request) {
             for (let o of top) {
                 let product = await productSchema.findOne({ _id: o.mstproductid, status: { $in: ['0'] } })
                 let discountedprice = ((Number(product.productmrp) - (Number(product.productdiscount) / 100) * Number(product.productmrp))).toFixed()
+                // let supplier = await sellerSchema.find({_id: o.mstsellerid, status: { $in: ['0']}})
                 let data = {
                     productname: product.productname,
                     productmrp: (Number(o.orderproductquantity) * Number(product.productmrp)).toFixed(),
@@ -277,7 +281,7 @@ export async function POST(request) {
                 let image = await productimageSchema.findOne({ mstproductid: product._id, productmainimage: { $in: ['1'] }, status: { $in: ['0'] } });
                 let color = await productcolorvariantsvaluesSchema.findOne({ mstproductid: product._id, status: { $in: ['0'] } })
                 let shiping = await orderproductshippingstatusSchema.findOne({ mstorderid: t._id, mstproductid: product._id, status: { $in: ['0'] } })
-                let seller = await sellerSchema.findOne({_id:o.mstsellerid, status: { $in: ['0'] } })
+                let seller = await sellerbusinesdetailsSchema.findOne({mstsellerid:o.mstsellerid, status: { $in: ['0'] } })
                 let data = {
                     _id: product._id,
                     seller:seller.storename,

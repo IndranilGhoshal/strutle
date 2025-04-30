@@ -187,10 +187,10 @@ export default function OrderDetailsComponent({ id }) {
                                                 <div className="details-btn-rit">
                                                     <div className="ordr-trk">
                                                         <ul>
-                                                            <li className={`${obj.orderproductconfirmedstatus == "1" ? "active" : ""}`}><strong>Order Confirmation</strong> <span>{moment(obj.orderproductconfirmeddatetime).format('LL')}</span></li>
-                                                            <li className={`${obj.orderproductshippingstatus == "1" ? "active" : ""}`}><strong>Shipped</strong> <span>{moment(obj.orderproductshippingdatetime).format('LL')}</span></li>
-                                                            <li className={`${obj.orderproductoutofdeliverystatus == "1" ? "active" : ""}`}><strong>Out for Delivery</strong> <span>{moment(obj.orderproductoutofdeliverydatetime).format('LL')}</span></li>
-                                                            <li className={`${obj.orderproductdeliveredstatus == "1" ? "active" : ""}`}><strong>Delivered</strong> <span>{moment(obj.orderproductdelivereddatetime).format('LL')}</span></li>
+                                                            <li className={`no-ord-bg ${obj.orderproductconfirmedstatus == "1" ? "active" : ""}`}><strong>Order Confirmation</strong> <span>{moment(obj.orderproductconfirmeddatetime).format('LL')}</span></li>
+                                                            <li className={`no-act-bg ${obj.orderproductshippingstatus == "1" ? "active act-bg" : ""}`}><strong>Shipped</strong> <span>{moment(obj.orderproductshippingdatetime).format('LL')}</span></li>
+                                                            <li className={`no-out-bg ${obj.orderproductoutofdeliverystatus == "1" ? "active act-bg" : ""}`}><strong>Out for Delivery</strong> <span>{moment(obj.orderproductoutofdeliverydatetime).format('LL')}</span></li>
+                                                            <li className={`no-del-bg ${obj.orderproductdeliveredstatus == "1" ? "active act-bg" : ""}`}><strong>Delivered</strong> <span>{moment(obj.orderproductdelivereddatetime).format('LL')}</span></li>
                                                         </ul>
                                                     </div>
                                                     <div className="ordr-trk-txt">

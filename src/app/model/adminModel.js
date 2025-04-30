@@ -182,13 +182,13 @@ export const productTypesAttributeValueSchema = mongoose.models.mstproducttypeat
 
 const sellerModel = new mongoose.Schema({
     image:String,
-    firstname:String,
-    lastname:String,
+    name:String,
     email:String,
-    phone:String,
-    status:String,
     password:String,
-    storename:String,
+    phone:String,
+    whatsapp:String,
+    esignature:String,
+    status:String,
     createdAt:String
 },
 {

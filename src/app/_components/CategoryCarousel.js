@@ -79,7 +79,7 @@ export default function CategoryCarousel() {
                                 {
                                     categorylist.map((obj, i) => (
                                         <div className="items" key={i}>
-                                            <div className="fade-in category-item" onClick={() => { goto('/productlist/' + obj._id) }}>
+                                            <div className="fade-in category-item" onClick={() => { goto('/productlist/' + obj._id+"?type=category") }}>
                                                 <Image src={"/upload/" + obj.image} alt="Fashion" width={500} height={100} />
                                                 <p className='txt-wp'>{obj.name}</p>
                                             </div>

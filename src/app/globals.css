@@ -549,3 +549,88 @@ strong.unbprdo {
     border-radius: 20px;
     border: 2px solid #0B369E;
 }
+
+ul.menu {
+    width: 160% !important;
+}
+
+.col-sm-12.txt-ha1 {
+    font-size: 13px;
+    font-weight: 700;
+    color: #0B369E;
+}
+
+.col-sm-12.add-ld-lt {
+    border: 1px solid lightgray;
+    padding: 10px;
+    border-radius: 10px;
+    margin-top: 10px;
+}
+
+.col-sm-12.add-ld-lt .txt {
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.col-sm-12.add-ld-lt span.txt-ty {
+    border: 1px solid #0B369E;
+    padding: 4px;
+    border-radius: 10px;
+    font-size: 11px;
+    color: #0B369E;
+}
+
+.col-sm-12.add-ld-lt .txt-ad {
+    font-size: 14px;
+}
+
+.col-sm-12.add-ld-lt .txt-def {
+    font-size: 14px;
+    color: #0B369E;
+    font-weight: 700;
+}
+
+.col-sm-12.add-ld-lt.active {
+    border: 2px solid #0B369E;
+}
+
+.col-sm-12.txt-ha1-lk {
+    text-align: center;
+    margin-top: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #0B369E;
+    padding: 0;
+}
+
+.seller .sidebar-new .accordion i{
+    margin-right: 10px;
+}
+
+button.nav-link.active.text-light {
+    font-weight: 500;
+}
+
+button.nav-link.text-light {
+    font-size: 16px;
+    font-weight: 300;
+}
+
+.seller .slr-nav-nae{
+    display: flex;
+    justify-content: space-between;
+}
+
+.seller .slr-nav-nae .dropdown-toggle::after {
+    display: none;
+}
+
+.seller .slr-nav-nae .drp-dwn{
+    padding-top: 18px;
+}
+
+button.btn.down_btn.atc-btn:hover,
+button.btn.down_btn.atc-btn {
+    background: #fff;
+    color: #0B369E;
+}

@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import { NextResponse } from "next/server";
 import { connectionStr } from "@/app/lib/db";
-import { consumerSchema, otpSchema } from "@/app/model/consumerModal";
+import { consumerSchema, consumershippingaddressSchema, otpSchema } from "@/app/model/consumerModal";
 import generateOtp from "../../_apiFunction/GenerateOtpFunction";
 import { otpsend } from "../../_apiFunction/OtpSendFunction";
 
@@ -27,10 +27,33 @@ export async function POST(request) {
                     if (results) {
                         let up = await otpSchema.findOneAndUpdate({ _id: re._id }, { status: "1" })
                         if(up){
-                            result = results
+                            let data = {
+                                _id:results._id,
+                                image: results.image,
+                                firstname: results.firstname,
+                                lastname: results.lastname,
+                                email: results.email,
+                                dateofbirth: results.dateofbirth,
+                                gender: results.gender,
+                                phone: results.phone,
+                                status: results.status
+                            }
+                            result = data
                             success = true;
                             message = "User Login Successfully"
                         }else{
+                            let data = {
+                                _id:results._id,
+                                image: results.image,
+                                firstname: results.firstname,
+                                lastname: results.lastname,
+                                email: results.email,
+                                dateofbirth: results.dateofbirth,
+                                gender: results.gender,
+                                phone: results.phone,
+                                status: results.status
+                            }
+                            result = data
                             success = true;
                             message = "User Login Successfully"
                         }
@@ -67,6 +90,7 @@ export async function POST(request) {
             message = "Wrong Otp"
         }
     }
+
     //OTP Resend
     else if (payload.reotpsend) {
         let FIVE_MINUTES = new Date().getTime() + 300000;
@@ -104,6 +128,7 @@ export async function POST(request) {
             message = "Internal server error"
         }
     }
+
     //OTP expired
     else if(payload.otpexpired){
         let re = await otpSchema.find({ phone: payload.phone })
@@ -120,6 +145,7 @@ export async function POST(request) {
             message = "Internal server error"
         }
     }
+
     else {
         let FIVE_MINUTES = new Date().getTime() + 300000;
         let otp = generateOtp({ len: "6", nums: true })

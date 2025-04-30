@@ -23,6 +23,10 @@ export default function ProductComponent({ id }) {
     const [productquantity, setProductquantity] = useState('')
     const [categoryname, setCategoryName] = useState('')
     const [categoryid, setCategoryId] = useState('')
+    const [subcategoryname, setSubCategoryName] = useState('')
+    const [subcategoryid, setSubCategoryId] = useState('')
+    const [producttypename, setProductTypeName] = useState('')
+    const [producttypeid, setProducttypeId] = useState('')
     const [images, setImages] = useState('')
     const [subimages, setSubImages] = useState([])
     const [imagesArray, setImagesArray] = useState([])
@@ -94,7 +98,6 @@ export default function ProductComponent({ id }) {
     ])
 
     useEffect(() => {
-        getCategoryData()
         getproductcategorydata(id)
         getproductimagedata(id)
         getproductdetailsdata(id)
@@ -105,32 +108,20 @@ export default function ProductComponent({ id }) {
         getproductvariantdata(id)
     }, [])
 
-    const getCategoryData = async () => {
-        let data = { list: true }
-        let response = await consumercategoryapi(data)
-        if (response.success) {
-            const { result } = response;
-            let temp = result
-            for (let t of temp) {
-                var element = document.getElementById("categoryactive" + t._id);
-                element.classList.remove("active");
-            }
-        } 
-    }
-
     const getproductcategorydata = async (id) => {
         showLoader()
-        let data = { id: id, productcategory: true }
+        let data = { mstproductid: id, bredcmdetails: true }
         let response = await productapi(data)
         if (response.success) {
             const { result } = response;
-            setProductName(result.name);
-            setProductId(result._id);
-            setCategoryName(result.category);
-            setCategoryId(result.mstcategoryid);
-            setTimeout(() => {
-                addCategoryClass(result.mstcategoryid)
-            }, 500);
+            setProductName(result.productname);
+            setProductId(result.product);
+            setCategoryName(result.categoryname);
+            setCategoryId(result.category);
+            setSubCategoryName(result.subcategoryname);
+            setSubCategoryId(result.subcategory);
+            setProductTypeName(result.producttypename);
+            setProducttypeId(result.producttype);
             setIsLoad(true)
             hideLoader()
         } else {
@@ -138,13 +129,13 @@ export default function ProductComponent({ id }) {
             setProductId('');
             setCategoryName('');
             setCategoryId('')
+            setSubCategoryName('');
+            setSubCategoryId('');
+            setProductTypeName('');
+            setProducttypeId('');
             setIsLoad(true)
             hideLoader()
         }
-    }
-    const addCategoryClass = (cid) => {
-        var element = document.getElementById("categoryactive" + cid);
-        element.classList.add("active");
     }
     const goto = (path) => {
         showLoader()
@@ -153,10 +144,6 @@ export default function ProductComponent({ id }) {
         setLocalStorageData('pathName', path)
     }
 
-    const removeCategoryClass = () => {
-        var element = document.getElementById("categoryactive" + categoryid);
-        element.classList.remove("active");
-    }
 
     const getproductimagedata = async (id) => {
         showLoader()
@@ -375,11 +362,15 @@ export default function ProductComponent({ id }) {
                     <>
                         <div className="bred-cm">
                             <ul>
-                                <li className="bred-cm-it" onClick={() => { goto('/'); removeCategoryClass() }}>Home</li>
+                                <li className="bred-cm-curr cp" onClick={() => { goto('/') }}>Home</li>
                                 <li><i className="bi bi-chevron-right"></i></li>
-                                <li className="bred-cm-it" onClick={() => { goto('/productlist/' + categoryid); }}>{categoryname}</li>
+                                <li className="bred-cm-curr cp" onClick={() => { goto('/productlist/' + categoryid+"?type=category"); }}>{categoryname}</li>
                                 <li><i className="bi bi-chevron-right"></i></li>
-                                <li className="bred-cm-curr"><p className='prdcrd-txt-wp'>{productname}</p></li>
+                                <li className="bred-cm-curr cp" onClick={() => { goto('/productlist/' + subcategoryid+"?type=subcategory"); }}>{subcategoryname}</li>
+                                <li><i className="bi bi-chevron-right"></i></li>
+                                <li className="bred-cm-curr cp" onClick={() => { goto('/productlist/' + producttypeid+"?type=producttype"); }}>{producttypename}</li>
+                                <li><i className="bi bi-chevron-right"></i></li>
+                                <li className="bred-cm-it not-cp"><p className='prdcrd-txt-wp'>{productname}</p></li>
                             </ul>
                         </div>
                         <div className="product-detail">

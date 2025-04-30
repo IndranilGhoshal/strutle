@@ -141,7 +141,7 @@ export default function OrderComponent({ handleChangeOrderDataPage, orderList, p
                                                             </div>
                                                             <div className="ord-lst-bot">
                                                                 <ul>
-                                                                    <li><a className='text-blue' onClick={() => { goto('/review') }}>Rate & Review Product</a></li>
+                                                                    <li><a className='text-blue' onClick={() => { goto('/review/'+obj._id+"?order="+item._id) }}>Rate & Review Product</a></li>
                                                                     <li><a href="">Help & Support</a></li>
                                                                 </ul>
                                                             </div>

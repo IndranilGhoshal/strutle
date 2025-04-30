@@ -19,12 +19,12 @@ export async function POST(request) {
             if (results.status == "1") {
                 success = false;
                 message = "User is inavtive"
-                responsestatus = StatusCodes.Unauthorized
+                responsestatus = StatusCodes.SUCCESS
             } else {
                 if (dencryptFunction(results.password) !== payload.password) {
                     success = false;
                     message = "Credentials entered are incorrect"
-                    responsestatus = StatusCodes.Unauthorized
+                    responsestatus = StatusCodes.SUCCESS
                 } else {
                     let token = getsignintoken(results._id)
                     let obj = {

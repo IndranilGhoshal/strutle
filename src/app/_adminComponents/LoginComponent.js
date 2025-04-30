@@ -40,6 +40,10 @@ export default function LoginComponent() {
             }
             hideLoader()
         }
+        // let bodyelem = document.getElementById('body')
+        // bodyelem.classList.remove("seller");
+        // bodyelem.classList.add("body-slide");
+        // bodyelem.classList.add("body-pd");
     }, [])
 
     const handleLogin = async () => {

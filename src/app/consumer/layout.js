@@ -4,7 +4,7 @@ import HeaderComponent from '../_components/HeaderComponent'
 import FooterComponent from '../_components/FooterComponent'
 import { getConnection, getLocalStorageData, internetconnectionflag } from '../lib/common';
 import { useRouter } from 'next/navigation';
-import { cartapi } from '../lib/apiService';
+import { cartapi, shippingaddressapi } from '../lib/apiService';
 import NoInternetConectionComponent from '../_components/NoInternetConectionComponent';
 import useNetworkStatus from '../lib/useNetworkStatus';
 
@@ -14,6 +14,8 @@ export const AppContext = createContext();
 export default function layout({ children }) {
   const [userImage, setUserImage] = useState(undefined);
   const [cartCount, setCartCount] = useState(0);
+  const [deliveryaddress, setDeliveryAddress] = useState('');
+  const [pincodeaddress, setPincodeAddress] = useState('');
 
   const { isOnline } = useNetworkStatus();
 
@@ -21,13 +23,22 @@ export default function layout({ children }) {
   useEffect(() => {
     let getPath = getLocalStorageData('pathName')
     if (getPath) {
-      router.push("/consumer" + getPath)
+      if(getPath == '/seller'){
+        router.push(getPath)
+      }else{
+        router.push("/consumer" + getPath)
+      }
     }
     let user = getLocalStorageData('consumer')
     if (user && user?.image) {
       getcartdata()
+      getdeliverydata()
       setUserImage(user.image)
     }
+    // let bodyelem = document.getElementById('body')
+    // bodyelem.classList.remove("seller");
+    // bodyelem.classList.remove("body-slide");
+    //     bodyelem.classList.remove("body-pd");
   }, [])
 
   const getcartdata = async () => {
@@ -39,12 +50,28 @@ export default function layout({ children }) {
     }
   }
 
+  const getdeliverydata = async () => {
+    let response = await shippingaddressapi({ mstconsumerid: getLocalStorageData('consumer')?._id, addresslist: true })
+    if (response.success) {
+      let { result } = response;
+      for (let r of result) {
+        if (r.isdefault == "1") {
+          setPincodeAddress(r.pincode)
+          setDeliveryAddress(r.district)
+        }
+      }
+    } else {
+      setPincodeAddress('')
+      setDeliveryAddress('')
+    }
+  }
+
 
   return (
     <>
       {
         isOnline ?
-          <AppContext.Provider value={{ userImage, setUserImage, cartCount, setCartCount }}>
+          <AppContext.Provider value={{ userImage, setUserImage, cartCount, setCartCount, deliveryaddress, setDeliveryAddress, pincodeaddress, setPincodeAddress }}>
             <HeaderComponent />
             <div id="consumerid" className="main">
               {children}

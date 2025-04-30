@@ -16,6 +16,12 @@ axios.interceptors.request.use(function (config) {
             config.data.userid = getLocalStorageData("admin")._id
         }
     }
+    if (getLocalStorageData('seller')?._id) {
+        config.headers.Authorization = getLocalStorageData('seller').token
+        if (getLocalStorageData("seller")?._id && config.method === 'post') {
+            config.data.userid = getLocalStorageData("seller")._id
+        }
+    }
     if (getLocalStorageData('consumer')?._id) {
         config.headers.Authorization = getLocalStorageData('consumer').token
         if (getLocalStorageData("admin")?._id && config.method === 'post') {
@@ -45,6 +51,11 @@ axios.interceptors.response.use(async (response) => {
         removeLocalStorageData("adminrole")
         removeLocalStorageData('col-key');
         window.location.href = baseURL+"/admin?session=error";
+    }
+    if (getLocalStorageData('seller')?._id && response.data.status == "401") {
+        removeLocalStorageData("seller")
+        removeLocalStorageData("pathName")
+        window.location.href = baseURL+"/seller?session=error";
     }
     return response
 })
@@ -190,6 +201,10 @@ export const productapi = async (data) => {
     return result
 }
 
+export const menuapi = async (data) => {
+    return getPost(baseURL + '/api/consumer/menu',data)
+}
+
 export const cartapi = async (data) => {
     return getPost(baseURL + '/api/consumer/cart',data)
 }
@@ -226,5 +241,17 @@ export const productreviewapi = async (data) => {
 export const giftcardApi = async (data) => {
     let result
     await axios.post(baseURL + "/api/consumer/giftcard", data).then(res => { result = res.data })
+    return result
+}
+
+export const sellerloginapi = async (data) => {
+    let result
+    await axios.post(baseURL + "/api/seller/login", data).then(res => { result = res.data })
+    return result
+}
+
+export const sellerorderapi = async (data) => {
+    let result
+    await axios.post(baseURL + "/api/seller/order", data).then(res => { result = res.data })
     return result
 }

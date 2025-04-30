@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import { NextResponse } from "next/server";
 import { connectionStr } from "@/app/lib/db";
 import { consumerSchema, favouritesSchema, productcolorvariantsSchema, productcolorvariantsvaluesSchema, productimageSchema, productinformationSchema, productotherattributesSchema, productotherattributevaluesSchema, productreviewSchema, productSchema } from "@/app/model/consumerModal";
-import { categorySchema } from "@/app/model/adminModel";
+import { categorySchema, productTypesSchema, subCategorySchema } from "@/app/model/adminModel";
 
 
 export async function POST(request) {
@@ -13,28 +13,8 @@ export async function POST(request) {
     let filter;
     await mongoose.connect(connectionStr, { useNewUrlParser: true });
 
-    //product category
-    if (payload.productcategory) {
-        filter = { _id: payload.id, status: { $in: ['0'] } };
-        let results = await productSchema.findOne(filter);
-        if (results) {
-            let category = await categorySchema.findOne({ _id: results.mstcategoryid, status: { $in: ['0'] } })
-            let obj = {
-                _id: results._id,
-                mstcategoryid: results.mstcategoryid,
-                category: category.name,
-                name: results.productname
-            }
-            result = obj
-            success = true
-            message = "Product found"
-        } else {
-            success = false
-            message = "Product not found"
-        }
-    }
     //product image
-    else if (payload.productimage) {
+    if (payload.productimage) {
         filter = { mstproductid: payload.id, status: { $in: ['0'] } };
         let results = await productimageSchema.find(filter);
         if (results) {
@@ -52,7 +32,7 @@ export async function POST(request) {
         let results = await productSchema.findOne(filter);
         if (results) {
             let fav = await favouritesSchema.findOne({ mstconsumerid: payload.mstconsumerid, mstproductid: payload.id, status: { $in: ['0'] } })
-            let obj ={
+            let obj = {
                 "_id": results._id,
                 "mstsellerid": results.mstsellerid,
                 "mstcategoryid": results.mstcategoryid,
@@ -63,7 +43,7 @@ export async function POST(request) {
                 "productmrp": results.productmrp,
                 "productquantity": results.productquantity,
                 "productdiscount": results.productdiscount,
-                favourite: fav ? "1":"0"
+                favourite: fav ? "1" : "0"
             }
             result = obj
             success = true
@@ -193,7 +173,7 @@ export async function POST(request) {
                         "mstproductcolorvariantid": v.mstproductcolorvariantid,
                         "image": image,
                         "colorname": v.colorname,
-                        "active": v.mstproductid == payload.id ? "1":"0"
+                        "active": v.mstproductid == payload.id ? "1" : "0"
                     }
                     o.push(obj)
                 }
@@ -208,13 +188,13 @@ export async function POST(request) {
         }
     }
     //Product Search
-    else if(payload.search){
+    else if (payload.search) {
         filter = { status: { $in: ['0'] } };
         let results = await productSchema.find(filter);
-        if (results.length>0) {
+        if (results.length > 0) {
             let temp = results
             let o = []
-            for(let t of temp){
+            for (let t of temp) {
                 o.push(t.productname)
             }
             result = o
@@ -225,7 +205,7 @@ export async function POST(request) {
             message = "Product not found"
         }
     }
-    else if(payload.searchid){
+    else if (payload.searchid) {
         filter = { productname: payload.productname, status: { $in: ['0'] } };
         let results = await productSchema.findOne(filter);
         if (results) {
@@ -235,6 +215,31 @@ export async function POST(request) {
         } else {
             success = false
             message = "Product id not found"
+        }
+    }
+    else if (payload.bredcmdetails) {
+        let obj;
+        let productresults = await productSchema.findOne({ _id: payload.mstproductid, status: { $in: ['0'] } });
+        let producttyperesults = await productTypesSchema.findOne({ _id: productresults.mstproducttypeid, status: { $in: ['0'] } });
+        let subcategoryresults = await subCategorySchema.findOne({ _id: productresults.mstsubcategoryid, status: { $in: ['0'] } });
+        let categoryresults = await categorySchema.findOne({ _id: productresults.mstcategoryid, status: { $in: ['0'] } });
+        obj = {
+            category: categoryresults._id,
+            categoryname: categoryresults.name,
+            subcategory: subcategoryresults._id,
+            subcategoryname: subcategoryresults.name,
+            producttype: producttyperesults._id,
+            producttypename: producttyperesults.name,
+            productname: productresults.productname,
+            product: productresults._id
+        }
+        if (obj) {
+            result = obj
+            success = true
+            message = "bredcm found"
+        } else {
+            success = false
+            message = "bredcm not found"
         }
     }
     return NextResponse.json({ result, success, message })

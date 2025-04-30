@@ -148,7 +148,8 @@ export default function AddAddressModal({addressarray, onMessage}) {
                         <div className="modal-body">
                             <div className="modal-head">
                                 <h3 className="add-addr">ADD NEW ADDRESS</h3>
-                                <button id="addaddressclsBtn" type="button" className="close-button abslt" data-bs-dismiss="modal" aria-label="Close" onClick={()=>{cancelevent()}}><i className="bi bi-x-lg"></i></button></div>
+                                <button id="addaddressclsBtn" type="button" className="close-button abslt" data-bs-dismiss="modal" aria-label="Close" onClick={()=>{cancelevent()}}><i className="bi bi-x-lg"></i></button>
+                                </div>
                             <div className="addrs-add">
                                 <p className="crnt-locn" style={{ display: "flex" }}><Image src={"/assets/img/locn-icne.png"} width={20} height={5} alt='loc' /> <span className='mx-2'> Enter your current location </span></p>
                                 <div className="row">

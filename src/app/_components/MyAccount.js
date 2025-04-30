@@ -17,7 +17,7 @@ import OrderListSkeleton from './_skeleton/OrderListSkeleton';
 import GiftListComponent from './GiftListComponent';
 
 export default function MyAccount() {
-    const { setUserImage } = useContext(AppContext);
+    const { setUserImage, setDeliveryAddress, setPincodeAddress } = useContext(AppContext);
     const router = useRouter();
     const searchparams = useSearchParams();
     const [user, setUser] = useState({})
@@ -222,6 +222,9 @@ export default function MyAccount() {
         showLoader()
         let response = await shippingaddressapi({ id: aid, mstconsumerid: getLocalStorageData('consumer')?._id, status: "1", ondelete: true })
         if (response.success) {
+            let {result} = response
+            setDeliveryAddress(result.pincode)
+            setPincodeAddress(result.district)
             onMessage(response.message, true)
             getAddressData()
             hideLoader()
