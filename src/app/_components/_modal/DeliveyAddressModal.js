@@ -58,7 +58,7 @@ export default function DeliveyAddressModal({ setDeliveryAddress, setPincodeAddr
             <div className="deliv-addrs cp" onClick={() => { checkuser() }}>
                 <i className="bi bi-geo-alt"></i>
                 <div className="deliv-addrs-txts">
-                    <strong>Delivery to {getLocalStorageData('consumer') ? getLocalStorageData('consumer')?.firstname : <></>}</strong>
+                    <strong>Delivery to {getLocalStorageData('consumer')?._id ? getLocalStorageData('consumer')?.firstname : <></>}</strong>
                     {
                         deliveryaddress ? <p>{deliveryaddress} {pincodeaddress}</p> : <p>Enter your location</p>
                     }

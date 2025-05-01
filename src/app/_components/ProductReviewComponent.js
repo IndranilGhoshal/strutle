@@ -22,6 +22,12 @@ export default function ProductReviewComponent({ id }) {
     const [fiverateingpersent, setFiverateingpersent] = useState('0')
     const [categoryname, setCategoryName] = useState('')
     const [categoryid, setCategoryId] = useState('')
+    const [subcategoryname, setSubCategoryName] = useState('')
+    const [subcategoryid, setSubCategoryId] = useState('')
+    const [producttypename, setProductTypeName] = useState('')
+    const [producttypeid, setProducttypeId] = useState('')
+    const [productid, setProductId] = useState('')
+
 
     useEffect(() => {
         getproductcategorydata(id)
@@ -31,25 +37,30 @@ export default function ProductReviewComponent({ id }) {
     }, [])
     const getproductcategorydata = async (id) => {
         showLoader()
-        let data = { id: id, productcategory: true }
+        let data = { mstproductid: id, bredcmdetails: true }
         let response = await productapi(data)
         if (response.success) {
             const { result } = response;
-            setCategoryName(result.category);
-            setCategoryId(result.mstcategoryid);
-            setTimeout(() => {
-                addCategoryClass(result.mstcategoryid)
-            }, 500);
+            setProductName(result.productname);
+            setProductId(result.product);
+            setCategoryName(result.categoryname);
+            setCategoryId(result.category);
+            setSubCategoryName(result.subcategoryname);
+            setSubCategoryId(result.subcategory);
+            setProductTypeName(result.producttypename);
+            setProducttypeId(result.producttype);
             hideLoader()
         } else {
+            setProductName('');
+            setProductId('');
             setCategoryName('');
             setCategoryId('')
+            setSubCategoryName('');
+            setSubCategoryId('');
+            setProductTypeName('');
+            setProducttypeId('');
             hideLoader()
         }
-    }
-    const addCategoryClass = (cid) => {
-        var element = document.getElementById("categoryactive" + cid);
-        element.classList.add("active");
     }
     const goto = (path) => {
         showLoader()
@@ -114,11 +125,15 @@ export default function ProductReviewComponent({ id }) {
         <>
             <div className="bred-cm">
                 <ul>
-                    <li className="bred-cm-it" onClick={() => { goto('/'); removeCategoryClass() }}>Home</li>
+                    <li className="bred-cm-curr cp" onClick={() => { goto('/') }}>Home</li>
                     <li><i className="bi bi-chevron-right"></i></li>
-                    <li className="bred-cm-it" onClick={() => { goto('/productlist/' + categoryid); }}>{categoryname}</li>
+                    <li className="bred-cm-curr cp" onClick={() => { goto('/productlist/' + categoryid + "?type=category"); }}>{categoryname}</li>
                     <li><i className="bi bi-chevron-right"></i></li>
-                    <li className="bred-cm-curr"><p className='prdcrd-txt-wp'>{productname}</p></li>
+                    <li className="bred-cm-curr cp" onClick={() => { goto('/productlist/' + subcategoryid + "?type=subcategory"); }}>{subcategoryname}</li>
+                    <li><i className="bi bi-chevron-right"></i></li>
+                    <li className="bred-cm-curr cp" onClick={() => { goto('/productlist/' + producttypeid + "?type=producttype"); }}>{producttypename}</li>
+                    <li><i className="bi bi-chevron-right"></i></li>
+                    <li className="bred-cm-it not-cp"><p className='prdcrd-txt-wp'>{productname}</p></li>
                 </ul>
             </div>
             <div className="product-review padding">
@@ -140,12 +155,12 @@ export default function ProductReviewComponent({ id }) {
                                         <div
                                             className="progress"
                                             role="progressbar"
-                                            aria-label="Basic example" 
+                                            aria-label="Basic example"
                                             aria-valuenow="75"
                                             aria-valuemin="0"
                                             aria-valuemax="100"
                                         >
-                                            <div className={`progress-bar ${fiverateingpersent?"w-"+fiverateingpersent:""}`} style={{ backgroundColor: '#068743' }}></div>
+                                            <div className={`progress-bar ${fiverateingpersent ? "w-" + fiverateingpersent : ""}`} style={{ backgroundColor: '#068743' }}></div>
                                         </div>
                                     </div>
                                     <strong>({fiverateingpersent}%)</strong>
@@ -155,7 +170,7 @@ export default function ProductReviewComponent({ id }) {
                                     <div className="progress-div">
                                         <div className="progress" role="progressbar" aria-label="Basic example" aria-valuenow="65"
                                             aria-valuemin="0" aria-valuemax="100">
-                                            <div className={`progress-bar ${fourrateingpersent?"w-"+fourrateingpersent:""}`} style={{ backgroundColor: '#068743' }}></div>
+                                            <div className={`progress-bar ${fourrateingpersent ? "w-" + fourrateingpersent : ""}`} style={{ backgroundColor: '#068743' }}></div>
                                         </div>
                                     </div>
                                     <strong>({fourrateingpersent}%)</strong>
@@ -165,7 +180,7 @@ export default function ProductReviewComponent({ id }) {
                                     <div className="progress-div">
                                         <div className="progress" role="progressbar" aria-label="Basic example" aria-valuenow="55"
                                             aria-valuemin="0" aria-valuemax="100">
-                                            <div className={`progress-bar ${threerateingpersent?"w-"+threerateingpersent:""}`} style={{ backgroundColor: '#068743' }}></div>
+                                            <div className={`progress-bar ${threerateingpersent ? "w-" + threerateingpersent : ""}`} style={{ backgroundColor: '#068743' }}></div>
                                         </div>
                                     </div>
                                     <strong>({threerateingpersent}%)</strong>
@@ -175,7 +190,7 @@ export default function ProductReviewComponent({ id }) {
                                     <div className="progress-div">
                                         <div className="progress" role="progressbar" aria-label="Basic example" aria-valuenow="45"
                                             aria-valuemin="0" aria-valuemax="100">
-                                            <div className={`progress-bar ${tworateingpersent?"w-"+tworateingpersent:""}`} style={{ backgroundColor: '#FFAD33' }}></div>
+                                            <div className={`progress-bar ${tworateingpersent ? "w-" + tworateingpersent : ""}`} style={{ backgroundColor: '#FFAD33' }}></div>
                                         </div>
                                     </div>
                                     <strong>({tworateingpersent}%)</strong>
@@ -185,7 +200,7 @@ export default function ProductReviewComponent({ id }) {
                                     <div className="progress-div">
                                         <div className="progress" role="progressbar" aria-label="Basic example" aria-valuenow="35"
                                             aria-valuemin="0" aria-valuemax="100">
-                                            <div className={`progress-bar ${onerateingpersent?"w-"+onerateingpersent:""}`} style={{ backgroundColor: '#DF1200' }}></div>
+                                            <div className={`progress-bar ${onerateingpersent ? "w-" + onerateingpersent : ""}`} style={{ backgroundColor: '#DF1200' }}></div>
                                         </div>
                                     </div>
                                     <strong>({onerateingpersent}%)</strong>

@@ -27,8 +27,6 @@ export async function POST(request) {
                 }else{
                     filter = { mstsellerid:payload.userid, orderstatus:payload.orderstatus, status: { $in: ['0'] } };
                 }
-                
-
                 // ------------Filter End------------ //
     
                 sortObj = {}
@@ -53,7 +51,6 @@ export async function POST(request) {
                             "_id": res._id,
                             "orderid": res.mstorderid,
                             "consumerid": re.mstconsumerid,
-                            "productid": ress._id,
                             "productname": ress.productname,
                             "createdAt": res.createdAt
                         }
@@ -71,18 +68,16 @@ export async function POST(request) {
                 // ------------List End------------ //
             }
             else if(payload.onstatus){
-                if(payload.orderstatus == "readytoship"){
-                    let results = await orderproductsSchema.findOneAndUpdate({ _id: payload.orderproductid }, { orderstatus: payload.orderstatus })
-                    result = await orderproductshippingstatusSchema.findOneAndUpdate({ mstorderid: results.mstorderid, mstproductid: results.mstproductid }, { orderproductconfirmedstatus: "1" })
-                }else if(payload.orderstatus == "shipped"){
-                    let results = await orderproductsSchema.findOneAndUpdate({ _id: payload.orderproductid }, { orderstatus: payload.orderstatus })
-                    result = await orderproductshippingstatusSchema.findOneAndUpdate({ mstorderid: results.mstorderid, mstproductid: results.mstproductid }, { orderproductshippingstatus: "1" })
+                if(payload.orderstatus == "readytopickup"){
+                    result = await orderproductsSchema.findOneAndUpdate({ _id: payload.orderproductid }, { orderstatus: payload.orderstatus })
+                }else if(payload.orderstatus == "pickup"){
+                    result = await orderproductsSchema.findOneAndUpdate({ _id: payload.orderproductid }, { orderstatus: payload.orderstatus })
                 }
                 if (result) {
-                    if (payload.orderstatus == "readytoship") {
-                        message = " Order is Ready to ship"
-                    } else if (payload.orderstatus == "shipped") {
-                        message = " Order is shipped"
+                    if (payload.orderstatus == "readytopickup") {
+                        message = " Order is Ready to pick up"
+                    } else if (payload.orderstatus == "pickup") {
+                        message = " Order is Pick Up"
                     } 
                     responsestatus = StatusCodes.SUCCESS
                     success = true

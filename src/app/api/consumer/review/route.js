@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import { NextResponse } from "next/server";
 import { connectionStr } from "@/app/lib/db";
-import { consumerSchema, favouritesSchema, productcolorvariantsSchema, productcolorvariantsvaluesSchema, productimageSchema, productinformationSchema, productotherattributesSchema, productotherattributevaluesSchema, productreviewSchema, productSchema } from "@/app/model/consumerModal";
+import { consumerSchema, favouritesSchema, orderproductshippingstatusSchema, orderproductsSchema, ordersSchema, productcolorvariantsSchema, productcolorvariantsvaluesSchema, productimageSchema, productinformationSchema, productotherattributesSchema, productotherattributevaluesSchema, productreviewSchema, productSchema, sellerbusinesdetailsSchema } from "@/app/model/consumerModal";
 import { categorySchema } from "@/app/model/adminModel";
 
 export async function POST(request) {
@@ -12,24 +12,27 @@ export async function POST(request) {
     let filter;
     await mongoose.connect(connectionStr, { useNewUrlParser: true });
 
-    //product details
-    if (payload.productdetails) {
-        filter = { _id: payload.id, status: { $in: ['0'] } };
+    //order product details
+    if (payload.orderproductdetails) {
+        filter = { _id: payload.mstproductid, status: { $in: ['0'] } };
         let results = await productSchema.findOne(filter);
         if (results) {
-            let fav = await favouritesSchema.findOne({ mstconsumerid: payload.mstconsumerid, mstproductid: payload.id, status: { $in: ['0'] } })
+            let image = await productimageSchema.findOne({ mstproductid: payload.mstproductid, productmainimage: { $in: ['1'] }, status: { $in: ['0'] } });
+            let color = await productcolorvariantsvaluesSchema.findOne({ mstproductid: payload.mstproductid, status: { $in: ['0'] } })
+            let shipped = await orderproductshippingstatusSchema.findOne({ mstorderid: payload.mstorderid, mstproductid: payload.mstproductid, status: { $in: ['0'] } })
+            let order = await ordersSchema.findOne({ _id: payload.mstorderid, status: { $in: ['0'] } })
+            let orderproduct = await orderproductsSchema.findOne({ mstproductid: payload.mstproductid, mstorderid: payload.mstorderid, status: { $in: ['0'] } })
+            let orderproductsupplier = await sellerbusinesdetailsSchema.findOne({ mstsellerid: orderproduct.mstsellerid, status: { $in: ['0'] } })
             let obj = {
-                "_id": results._id,
-                "mstsellerid": results.mstsellerid,
-                "mstcategoryid": results.mstcategoryid,
-                "mstsubcategoryid": results.mstsubcategoryid,
-                "mstproducttypeid": results.mstproducttypeid,
+                "productid": results._id,
                 "productname": results.productname,
-                "producttitledescription": results.producttitledescription,
-                "productmrp": results.productmrp,
-                "productquantity": results.productquantity,
-                "productdiscount": results.productdiscount,
-                favourite: fav ? "1" : "0"
+                "productimage": image.productimage,
+                "productcolor": color.colorname,
+                "productquantity": orderproduct.orderproductquantity,
+                "orderid": order._id,
+                "orderdate": order.createdAt,
+                "orderdelivereddate": shipped.orderproductdelivereddatetime,
+                "seller": orderproductsupplier.businessname,
             }
             result = obj
             success = true
@@ -37,6 +40,23 @@ export async function POST(request) {
         } else {
             success = false
             message = "Product not found"
+        }
+    } else if (payload.addreview) {
+        let Obj = {
+            mstproductid: payload.mstproductid,
+            mstconsumerid: payload.mstconsumerid,
+            rate: payload.rate,
+            description: payload.description,
+            status: "0",
+        }
+        const res = new productreviewSchema(Obj);
+        let r = await res.save()
+        if(r){
+            success = true
+            message = "Review submited"
+        }else{
+            success = false
+            message = "Review submited"
         }
     }
 

@@ -22,6 +22,7 @@ export default function OrderComponent() {
   const [btntab, setbtntab] = useState('pending')
 
   const [productlist, setProductlist] = useState([])
+  const [seller, setSeller] = useState([])
   const [totalamount, settotalamount] = useState('')
   const [ordernumber, setordernumber] = useState('')
   const [orderdate, setorderdate] = useState('')
@@ -51,8 +52,9 @@ export default function OrderComponent() {
       setList(response.result)
     } else {
       hideLoader()
+      setListlength('0')
       setList([])
-      setPage(0)
+      setPage('0')
     }
   }
 
@@ -80,9 +82,9 @@ export default function OrderComponent() {
     }
   }
 
-  const getInvoice = async (id, cid) => {
+  const getInvoice = async (id, cid, pid) => {
     showLoader()
-    let data = { id: id, mstconsumerid: cid, invioce: true }
+    let data = { id: id, productid:pid, mstconsumerid: cid, invioce: true }
     let response = await orderapi(data)
     if (response.success) {
       let { result } = response
@@ -91,6 +93,7 @@ export default function OrderComponent() {
       setconsumeraddress(result.consumeraddress)
       setorderdate(result.orderdate)
       setordernumber(result._id)
+      setSeller(result.seller)
       hideLoader()
     } else {
       setProductlist([])
@@ -137,6 +140,7 @@ export default function OrderComponent() {
               ordernumber={ordernumber}
               orderdate={orderdate}
               consumeraddress={consumeraddress}
+              seller={seller}
             />
           }
         </div>

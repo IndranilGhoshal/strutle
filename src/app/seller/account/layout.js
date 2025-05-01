@@ -22,7 +22,7 @@ export default function Layout({ children }) {
         // elem.classList.add("seller");
         // elem.classList.remove("body-slide");
         // elem.classList.remove("body-pd");
-        // let getPath = getLocalStorageData('pathName')
+        let getPath = getLocalStorageData('pathName')
         if (getPath) {
             router.push("/seller/account" + getPath)
         }
@@ -74,7 +74,7 @@ export default function Layout({ children }) {
                                                             onClick={() => { getCollapse(i) }}
                                                         >
                                                             <i className={`bi ${item.menuIcon}`}></i>
-                                                            <span className='text-blue'>{item.menuName}</span>
+                                                            <span className='text-blue mx-2'>{item.menuName}</span>
                                                         </button>
                                                     </>
                                                     :
@@ -89,7 +89,7 @@ export default function Layout({ children }) {
                                                             onClick={() => { goto(item.menuUrl) }}
                                                         >
                                                             <i className={`bi ${item.menuIcon}`}></i>
-                                                            <span className='text-blue'>{item.menuName}</span>
+                                                            <span className='text-blue mx-2'>{item.menuName}</span>
                                                         </button>
                                                     </>
                                             }

@@ -358,19 +358,24 @@ const giftcardpaymentsModel = new mongoose.Schema({
 
 export const giftcardpaymentsSchema = mongoose.models.mstgiftcardpayments || mongoose.model("mstgiftcardpayments", giftcardpaymentsModel);
 
-const sellerModel = new mongoose.Schema({
-    image:String,
-    firstname:String,
-    lastname:String,
-    email:String,
-    phone:String,
+const sellerbusinesdetailsModel = new mongoose.Schema({
+    mstsellerid:String,
+    enrolmentno:String,
+    gstinno:String,
+    businessname:String,
+    businesstype:String,
+    panno:String,
+    addressone:String,
+    addresstwo:String,
+    city:String,
+    pin:String,
+    state:String,
+    landmark:String,
     status:String,
-    password:String,
-    storename:String,
     createdAt:String
 },
 {
     timestamps:true
 });
 
-export const sellerSchema = mongoose.models.mstsellers || mongoose.model("mstsellers", sellerModel);
+export const sellerbusinesdetailsSchema = mongoose.models.mstsellerbusinesdetails || mongoose.model("mstsellerbusinesdetails", sellerbusinesdetailsModel);

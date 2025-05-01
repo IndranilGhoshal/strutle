@@ -307,6 +307,13 @@ button#dropdown-loginpgofile img.hrd_img {
     text-overflow: ellipsis;
 }
 
+.txt-wp-sm {
+    white-space: nowrap;
+    width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .topicon {
     cursor: pointer;
 }
@@ -633,4 +640,10 @@ button.btn.down_btn.atc-btn:hover,
 button.btn.down_btn.atc-btn {
     background: #fff;
     color: #0B369E;
+}
+
+.invoice .invoice-top strong{
+    color: black;
+    font-weight: 700;
+    margin-right: 10px;
 }

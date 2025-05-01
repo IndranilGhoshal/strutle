@@ -3,11 +3,12 @@ import moment from 'moment'
 import Image from 'next/image'
 import React, { useState } from 'react'
 
-export default function InvoiceModal({ productlist, getInvoice, id, totalamount, consumeraddress, orderdate, ordernumber }) {
-    
+export default function InvoiceModal({ productid, product, seller, getInvoice, id, totalamount, consumeraddress, orderdate, ordernumber }) {
+
     return (
         <>
-            <a className='text-blue' data-bs-toggle="modal" data-bs-target="#downloadinvoice" onClick={() => { getInvoice(id) }}>Download Invoice</a>
+            <button className="btn btn-rtn-exc mx-2 mb-2" onClick={() => { getInvoice(id, productid) }} data-bs-toggle="modal" data-bs-target="#downloadinvoice">Download Invoice</button>
+
             <div className="modal fade" id="downloadinvoice" tabIndex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" data-bs-backdrop="static">
                 <div className="modal-dialog modal-xl">
                     <div className="modal-content">
@@ -23,30 +24,32 @@ export default function InvoiceModal({ productlist, getInvoice, id, totalamount,
                                     </div>
                                 </div>
                                 <div className="invoice-details">
-                                    <div className="box">
-                                        <h4>Sold By</h4>
-                                        <strong>Vivid Vision International</strong>
-                                        <p>
-                                            9029 Arcane, Jupiter 2<br />
-                                            (+254) 243-124-392<br />
-                                            PAN No: AAJFV2364D<br />
-                                            GST Reg No: 07AAJFV2364D1Z7</p>
-                                    </div>
-
+                                    {
+                                        seller.map((item, i) => (
+                                            <div key={i} className="box">
+                                                <h4>Sold By</h4>
+                                                <strong>{item.businessname}</strong>
+                                                <p>
+                                                {item.city}, {item.state} - {item.pin}<br />
+                                                    PAN No: {item.panno}<br />
+                                                    GST Reg No: {item.gstinno}</p>
+                                            </div>
+                                        ))
+                                    }
                                     <div className="box box-rit">
                                         <div className="box-innr">
                                             <h4>Billed Address</h4>
                                             <strong>{consumeraddress.consumer}</strong>
-                                            <p>{consumeraddress.locality+", "+consumeraddress.building}</p>
-                                            <p>{consumeraddress.district+", "+consumeraddress.state+"-"+consumeraddress.pincode}</p>
+                                            <p>{consumeraddress.locality + ", " + consumeraddress.building}</p>
+                                            <p>{consumeraddress.district + ", " + consumeraddress.state + "-" + consumeraddress.pincode}</p>
                                             <p>{consumeraddress.phone}</p>
                                         </div>
 
                                         <div className="box-innr">
                                             <h4>Shipping Address</h4>
                                             <strong>{consumeraddress.consumer}</strong>
-                                            <p>{consumeraddress.locality+", "+consumeraddress.building}</p>
-                                            <p>{consumeraddress.district+", "+consumeraddress.state+"-"+consumeraddress.pincode}</p>
+                                            <p>{consumeraddress.locality + ", " + consumeraddress.building}</p>
+                                            <p>{consumeraddress.district + ", " + consumeraddress.state + "-" + consumeraddress.pincode}</p>
                                             <p>{consumeraddress.phone}</p>
                                         </div>
                                     </div>
@@ -67,11 +70,8 @@ export default function InvoiceModal({ productlist, getInvoice, id, totalamount,
                                             </tr>
                                         </thead>
                                         <tbody>
-
                                             {
-
-
-                                                productlist.length > 0 && productlist.map((item, i) => (
+                                                product.length > 0 && product.map((item, i) => (
                                                     <tr key={i}>
                                                         <td>{i + 1}</td>
                                                         <td>{item.productname}</td>

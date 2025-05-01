@@ -3,13 +3,12 @@ import Image from 'next/image'
 import React, { useState } from 'react'
 import { Modal } from 'react-bootstrap';
 
-export default function DownloadInvoiceModal({ productlist, getInvoice, id, totalamount, consumeraddress, orderdate, ordernumber, consumerid }) {
+export default function DownloadInvoiceModal({ productlist, productid, seller, getInvoice, id, totalamount, consumeraddress, orderdate, ordernumber, consumerid }) {
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
   return (
     <>
-      <button onClick={() => { getInvoice(id, consumerid); setShow(true) }}><i className="bi bi-receipt"></i>&nbsp;&nbsp;Download Invoice</button>
-
+      <button onClick={() => { getInvoice(id, consumerid, productid); setShow(true) }}><i className="bi bi-receipt"></i>&nbsp;&nbsp;Download Invoice</button>
       {
         totalamount &&
         <Modal
@@ -31,15 +30,18 @@ export default function DownloadInvoiceModal({ productlist, getInvoice, id, tota
                 </div>
               </div>
               <div className="invoice-details">
-                <div className="box">
-                  <h4>Sold By</h4>
-                  <strong>Vivid Vision International</strong>
-                  <p>
-                    9029 Arcane, Jupiter 2<br />
-                    (+254) 243-124-392<br />
-                    PAN No: AAJFV2364D<br />
-                    GST Reg No: 07AAJFV2364D1Z7</p>
-                </div>
+                {
+                  seller.map((item, i) => (
+                    <div key={i} className="box">
+                      <h4>Sold By</h4>
+                      <strong>{item.businessname}</strong>
+                      <p>
+                        {item.city}, {item.state} - {item.pin}<br />
+                        PAN No: {item.panno}<br />
+                        GST Reg No: {item.gstinno}</p>
+                    </div>
+                  ))
+                }
 
                 <div className="box box-rit">
                   <div className="box-innr">
@@ -119,7 +121,6 @@ export default function DownloadInvoiceModal({ productlist, getInvoice, id, tota
           </Modal.Body>
         </Modal>
       }
-
     </>
   )
 }

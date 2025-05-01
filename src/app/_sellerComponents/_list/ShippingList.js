@@ -1,31 +1,20 @@
 import React from 'react'
 import UsePagination from '../UsePagination'
-import moment from 'moment'
 import Image from 'next/image'
-import DownloadInvoiceModal from '../_modal/DownloadInvoiceModal'
+import moment from 'moment'
 
-export default function OrderList(
-    {
-        list,
-        limit,
-        setlimit,
-        offset,
-        page,
-        handleChangePage,
-        search,
-        setSearch,
-        listlength,
-        onStatus,
-        btntab,
-        productlist,
-        getInvoice,
-        totalamount,
-        ordernumber,
-        orderdate,
-        consumeraddress,
-        seller
-    }
-) {
+export default function ShippingList({
+    list,
+    limit,
+    setlimit,
+    page,
+    handleChangePage,
+    search,
+    setSearch,
+    listlength,
+    onStatus,
+    btntab,
+}) {
     return (
         <>
             <div className="mastr_hw">
@@ -40,7 +29,7 @@ export default function OrderList(
                     /><button className="btn no-bg"><i className="bi bi-search"></i></button>
                 </div>
                 <div className="assects_src_dvadd">
-                    <button className="btn btn-dwn p-0 dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">Filter Order List <i className="bi bi-sliders"></i></button>
+                    <button className="btn btn-dwn p-0 dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">Filter List <i className="bi bi-sliders"></i></button>
                     <div className="dropdown-menu dropdown-menu-end">
                         <div className="filter-lists">
                             <label>Filter by Status</label>
@@ -88,27 +77,16 @@ export default function OrderList(
                                                     <div className="filter-lists">
                                                         <div className='edtbtn'>
                                                             {
-                                                                btntab == "pending" &&
-                                                                <button onClick={() => { onStatus(item._id, "readytoship") }}><i className="bi bi-truck"></i>&nbsp;&nbsp;Ready To Ship</button>
-                                                            }
-                                                            {
-                                                                btntab == "readytoship" &&
-                                                                <button onClick={() => { onStatus(item._id, "shipped") }}><i className="bi bi-truck"></i>&nbsp;&nbsp;Shipped</button>
-                                                            }
-                                                            {
                                                                 btntab == "shipped" &&
-                                                                <DownloadInvoiceModal 
-                                                                consumerid={item.consumerid}
-                                                                id={item.orderid}
-                                                                productid={item.productid}
-                                                                getInvoice={getInvoice}
-                                                                productlist={productlist}
-                                                                totalamount={totalamount}
-                                                                ordernumber={ordernumber}
-                                                                orderdate={orderdate}
-                                                                consumeraddress={consumeraddress}
-                                                                seller={seller}
-                                                                />
+                                                                <button onClick={() => { onStatus(item._id, "readytopickup") }}><i className="bi bi-truck"></i>&nbsp;&nbsp;Ready To Pick Up</button>
+                                                            }
+                                                            {
+                                                                btntab == "readytopickup" &&
+                                                                <button onClick={() => { onStatus(item._id, "pickup") }}><i className="bi bi-truck"></i>&nbsp;&nbsp;Pick Up</button>
+                                                            }
+                                                            {
+                                                                btntab == "pickup" &&
+                                                                <><button><i className="bi bi-truck"></i>&nbsp;&nbsp;Shipping Details</button></>
                                                             }
                                                         </div>
                                                     </div>
@@ -151,7 +129,7 @@ export default function OrderList(
                                         ))
                                     }
                                 </select>
-                                <span>{list.length} order{list.length > 1 ? "s" : ""} <strong>per page</strong></span>
+                                <span>{list.length} shipping{list.length > 1 ? "s" : ""} <strong>per page</strong></span>
 
                             </div>
 

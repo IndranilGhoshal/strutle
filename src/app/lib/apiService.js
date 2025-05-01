@@ -238,6 +238,12 @@ export const productreviewapi = async (data) => {
     return result
 }
 
+export const reviewapi = async (data) => {
+    let result
+    await axios.post(baseURL + "/api/consumer/review", data).then(res => { result = res.data })
+    return result
+}
+
 export const giftcardApi = async (data) => {
     let result
     await axios.post(baseURL + "/api/consumer/giftcard", data).then(res => { result = res.data })
@@ -253,5 +259,11 @@ export const sellerloginapi = async (data) => {
 export const sellerorderapi = async (data) => {
     let result
     await axios.post(baseURL + "/api/seller/order", data).then(res => { result = res.data })
+    return result
+}
+
+export const sellershippingapi = async (data) => {
+    let result
+    await axios.post(baseURL + "/api/seller/shipping", data).then(res => { result = res.data })
     return result
 }

@@ -12,10 +12,15 @@ export default function OrderDetailsComponent({ id }) {
     const router = useRouter();
     const [isLoad, setIsLoad] = useState(false)
     const [productlist, setProductlist] = useState([])
+    const [product, setProduct] = useState([])
+    const [seller, setSeller] = useState([])
     const [totalamount, settotalamount] = useState('')
     const [ordernumber, setordernumber] = useState('')
     const [orderdate, setorderdate] = useState('')
     const [paymenttype, setpaymenttype] = useState('')
+    const [paymentstatus, setpaymentstatus] = useState('')
+
+
 
     const [consumeraddress, setconsumeraddress] = useState({})
     const [subtotal, setSubTotal] = useState(0)
@@ -28,6 +33,7 @@ export default function OrderDetailsComponent({ id }) {
     useEffect(() => {
         getorderdetails()
     }, [])
+
     const getorderdetails = async () => {
         showLoader()
         let data = { id: id, mstconsumerid: getLocalStorageData('consumer')._id, details: true }
@@ -40,6 +46,7 @@ export default function OrderDetailsComponent({ id }) {
             setorderdate(result.orderdate)
             setordernumber(result._id)
             setpaymenttype(result.paymenttype)
+            setpaymentstatus(result.paymentstatus)
             getprice(id)
             hideLoader()
         } else {
@@ -49,6 +56,30 @@ export default function OrderDetailsComponent({ id }) {
             setorderdate('')
             setordernumber('')
             setpaymenttype('')
+            hideLoader()
+        }
+    }
+
+    const getInvoice = async (id, pid) => {
+        showLoader()
+        let data = { id: id, productid:pid, mstconsumerid: getLocalStorageData('consumer')._id, invioce: true }
+        let response = await orderapi(data)
+        if (response.success) {
+            let { result } = response
+            setProduct(result.product)
+            settotalamount(result.totalamount)
+            setconsumeraddress(result.consumeraddress)
+            setorderdate(result.orderdate)
+            setordernumber(result._id)
+            setSeller(result.seller)
+            hideLoader()
+        } else {
+            setProductlist([])
+            setSeller([])
+            settotalamount('0')
+            setconsumeraddress({})
+            setorderdate('')
+            setordernumber('')
             hideLoader()
         }
     }
@@ -124,16 +155,7 @@ export default function OrderDetailsComponent({ id }) {
                                             <li>Order ID: <strong>{ordernumber}</strong></li>
                                             <li>Order Date: <strong>{moment(orderdate).format('LL')}</strong></li>
                                             <li>Payment Methods: <strong>{paymenttype}</strong></li>
-                                            <li>Invoice <span>
-                                                <InvoiceModal
-                                                    id={id}
-                                                    productlist={productlist}
-                                                    getInvoice={getorderdetails}
-                                                    totalamount={totalamount}
-                                                    consumeraddress={consumeraddress}
-                                                    ordernumber={ordernumber}
-                                                    orderdate={orderdate}
-                                                /></span></li>
+                                            <li>Payment Status: <strong>{paymentstatus}</strong></li>
                                         </ul>
                                     </div>
                                 </div>
@@ -176,12 +198,30 @@ export default function OrderDetailsComponent({ id }) {
                                                         </ul>
                                                         <p className="txt-selr"><strong>Seller:</strong> {obj.seller}</p>
                                                         <p className="txt-pric">₹{obj.productnetamount}</p>
-                                                        <p className="txt-dlvry"><strong>Delivery {moment(obj.deliveryat).format('LL')}</strong></p>
                                                         {
-                                                            obj.orderproductdeliveredstatus == "1" ? 
-                                                            <button className="btn btn-rtn-exc mb-2" onClick={() => { goto('/return') }}>Return & Exchange</button> : <></>
+                                                            obj.orderproductdeliveredstatus == "1" ?
+                                                                <p className="txt-dlvry"><strong>Deliverd {moment(obj.deliveryat).format('LL')}</strong></p> : <p className="txt-dlvry"><strong>Delivery at {moment(obj.deliveryat).format('LL')}</strong></p>
                                                         }
-                                                        
+                                                        {
+                                                            obj.orderproductdeliveredstatus == "1" ?
+                                                                <button className="btn btn-rtn-exc mb-2" onClick={() => { goto('/return') }}>Return & Exchange</button> : <></>
+                                                        }
+                                                        {
+                                                            obj.orderproductdeliveredstatus == "1" ?
+                                                                <InvoiceModal
+                                                                    id={id}
+                                                                    productid={obj._id}
+                                                                    product={product}
+                                                                    seller={seller}
+                                                                    getInvoice={getInvoice}
+                                                                    totalamount={totalamount}
+                                                                    consumeraddress={consumeraddress}
+                                                                    ordernumber={ordernumber}
+                                                                    orderdate={orderdate}
+                                                                />
+                                                                : <></>
+                                                        }
+
                                                     </div>
                                                 </div>
                                                 <div className="details-btn-rit">

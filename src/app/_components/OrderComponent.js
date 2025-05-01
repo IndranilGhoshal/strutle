@@ -7,36 +7,10 @@ import InvoiceModal from './_modal/InvoiceModal'
 import { orderapi } from '@/app/lib/apiService'
 import { getLocalStorageData, hideLoader, removeLocalStorageData, setLocalStorageData, showLoader } from '@/app/lib/common'
 import { useRouter } from 'next/navigation'
+import { Rating } from 'react-simple-star-rating'
 
 export default function OrderComponent({ handleChangeOrderDataPage, orderList, pageorderList, orderSearch, setorderSearch }) {
     const router = useRouter();
-    const [productlist, setProductlist] = useState([])
-    const [totalamount, settotalamount] = useState('')
-    const [ordernumber, setordernumber] = useState('')
-    const [orderdate, setorderdate] = useState('')
-    const [consumeraddress, setconsumeraddress] = useState({})
-
-    const getInvoice = async (id) => {
-        showLoader()
-        let data = { id: id, mstconsumerid: getLocalStorageData('consumer')._id, invioce: true }
-        let response = await orderapi(data)
-        if (response.success) {
-            let { result } = response
-            setProductlist(result.product)
-            settotalamount(result.totalamount)
-            setconsumeraddress(result.consumeraddress)
-            setorderdate(result.orderdate)
-            setordernumber(result._id)
-            hideLoader()
-        } else {
-            setProductlist([])
-            settotalamount(0)
-            setconsumeraddress({})
-            setorderdate('')
-            setordernumber('')
-            hideLoader()
-        }
-    }
 
     const goto = (path) => {
         showLoader()
@@ -92,17 +66,6 @@ export default function OrderComponent({ handleChangeOrderDataPage, orderList, p
                                                         <li><strong>Order Date</strong>
                                                             <span>{moment(item.orderdate).format('LL')}</span>
                                                         </li>
-                                                        <li><strong>Invoice</strong>
-                                                            <InvoiceModal
-                                                                id={item._id}
-                                                                productlist={productlist}
-                                                                getInvoice={getInvoice}
-                                                                totalamount={totalamount}
-                                                                consumeraddress={consumeraddress}
-                                                                ordernumber={ordernumber}
-                                                                orderdate={orderdate}
-                                                            />
-                                                        </li>
                                                     </ul>
                                                     <div className="totl-pay">
                                                         <span>Paid Amount</span>
@@ -141,7 +104,12 @@ export default function OrderComponent({ handleChangeOrderDataPage, orderList, p
                                                             </div>
                                                             <div className="ord-lst-bot">
                                                                 <ul>
-                                                                    <li><a className='text-blue' onClick={() => { goto('/review/'+obj._id+"?order="+item._id) }}>Rate & Review Product</a></li>
+                                                                    {
+                                                                        obj.deliveredstatus == "1" && obj.isreview == "0" && <li><a className='text-blue' onClick={() => { goto('/review/'+obj._id+"?order="+item._id) }}>Rate & Review Product</a></li>
+                                                                    }
+                                                                    {
+                                                                        obj.deliveredstatus == "1" && obj.isreview == "1" && <li><Rating initialValue={obj.rate} readonly={true} size={20} /> Review Submited!</li>
+                                                                    }
                                                                     <li><a href="">Help & Support</a></li>
                                                                 </ul>
                                                             </div>
