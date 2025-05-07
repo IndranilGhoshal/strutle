@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react'
 import { getLocalStorageData, hideLoader, opneLoginModal, opneQuickViewProductModal, removeLocalStorageData, setLocalStorageData, setPassData, setSessionStorageData, showLoader } from '../lib/common'
 import Image from 'next/image'
-import { consumercategoryapi, favouriteapi, productlistapi } from '../lib/apiService'
+import { consumercategoryapi, favouriteapi, getgstapi, productlistapi } from '../lib/apiService'
 import { useRouter, useSearchParams } from 'next/navigation'
 import UsePagination from './UsePagination'
 import { Rating } from 'react-simple-star-rating'
@@ -57,7 +57,14 @@ export default function ProductListComponent({ id }) {
 
     useEffect(() => {
         getfilterdata()
+        // getgst()
     }, [])
+
+
+    // const getgst = async () =>{
+    //     let res = await getgstapi("19AADCS6985J1ZL")
+    //     console.log("res", res);
+    // }
 
     const getdata = async (l, s, c, size, color, price, discount, rating, sd) => {
         showLoader()

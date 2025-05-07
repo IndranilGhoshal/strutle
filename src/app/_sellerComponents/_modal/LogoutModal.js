@@ -19,7 +19,7 @@ export default function LogoutModal() {
     }
     return (
         <>
-            <a className="dropdown-item" onClick={handleShow}>Sign out</a>
+            <a className="dropdown-item mb-1" onClick={handleShow}>Sign out</a>
 
             <Modal
                 show={show}

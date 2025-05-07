@@ -2,7 +2,7 @@
 import { Resend } from 'resend';
 const {RESEND_API_KEY} = process.env
 import EmailForgotPasswordTemplate from '../_emailTemplate/EmailForgotPasswordTemplate';
-import { urlpath } from '@/app/lib/config';
+import { BASE_URL } from '@/app/lib/config';
 
 const resend = new Resend(RESEND_API_KEY);
 
@@ -13,7 +13,7 @@ const ForgotPasswordEmailFunction = async(props) => {
           from: props.from,
           to: [props.to],
           subject: 'Forgot password link',
-          react: EmailForgotPasswordTemplate({ Link: urlpath+'/admin/resetPassword/'+props.id+"?t="+TEN_MINUTES, authEmail:props.from, name:props.name }),
+          react: EmailForgotPasswordTemplate({ Link: BASE_URL+props.link+props.id+"?t="+TEN_MINUTES, authEmail:props.from, name:props.name }),
         });
     
         if (error) {

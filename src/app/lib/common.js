@@ -68,4 +68,3 @@ export function opneQuickViewProductModal () {
     var element = document.getElementById("quickviewbutton");
     element.click()
 }
-

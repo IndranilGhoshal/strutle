@@ -17,9 +17,11 @@ export default function ResetPasswordComponent({ id, expTime }) {
     const router = useRouter();
 
     useEffect(() => {
-        if (getLocalStorageData("admin") === null) {
+        if (!getLocalStorageData("admin") && id) {
             router.push("/admin/resetPassword/" + id);
             hideLoader()
+        } else if (!getLocalStorageData("seller") && !id) {
+            router.push("/admin/forgotpassword");
         } else {
             router.push("/admin/account");
         }
@@ -48,7 +50,7 @@ export default function ResetPasswordComponent({ id, expTime }) {
         }
         if (err == 0) {
             showLoader()
-            let data = { id, password, accountreset:false }
+            let data = { id, password}
             let response = await adminResetPasswordApi(data)
             if (response.success) {
                 setPassData(response.message)
@@ -84,57 +86,57 @@ export default function ResetPasswordComponent({ id, expTime }) {
                     <div className="col-right">
                         <div className="login-form">
                             <h2>Reset Password</h2>
-                                <p className="position-relative">
-                                    <label>Enter Password<span>*</span></label>
-                                    <input
-                                        type={passwordType}
-                                        value={password}
-                                        onChange={(e) => { setPassword(e.target.value) }}
-                                    />
-                                    {
-                                        passwordType === 'password'
-                                            ?
-                                            <>
-                                                <button className="btn btn-vw" onClick={() => { setPasswordType("text") }}><i className="bi bi-eye-slash-fill"></i></button>
-                                            </>
-                                            :
-                                            <>
-                                                <button className="btn btn-vw" onClick={() => { setPasswordType("password") }}><i className="bi bi-eye-fill"></i></button>
-                                            </>
-                                    }
-                                </p>
+                            <p className="position-relative">
+                                <label>Enter Password<span>*</span></label>
+                                <input
+                                    type={passwordType}
+                                    value={password}
+                                    onChange={(e) => { setPassword(e.target.value) }}
+                                />
                                 {
-                                    error && !password && <div className='input-error'>Please enter password</div>
+                                    passwordType === 'password'
+                                        ?
+                                        <>
+                                            <button className="btn btn-vw" onClick={() => { setPasswordType("text") }}><i className="bi bi-eye-slash-fill"></i></button>
+                                        </>
+                                        :
+                                        <>
+                                            <button className="btn btn-vw" onClick={() => { setPasswordType("password") }}><i className="bi bi-eye-fill"></i></button>
+                                        </>
                                 }
-                                <p className="position-relative">
-                                    <label>Confirm Password<span>*</span></label>
-                                    <input
-                                        type={confirmPasswordType}
-                                        value={confirmPassword}
-                                        onChange={(e) => { setConfirmPassword(e.target.value) }}
-                                    />
-                                    {
-                                        confirmPasswordType === 'password'
-                                            ?
-                                            <>
-                                                <button className="btn btn-vw" onClick={() => { setConfirmPasswordType("text") }}><i className="bi bi-eye-slash-fill"></i></button>
-                                            </>
-                                            :
-                                            <>
-                                                <button className="btn btn-vw" onClick={() => { setConfirmPasswordType("password") }}><i className="bi bi-eye-fill"></i></button>
-                                            </>
-                                    }
-                                </p>
+                            </p>
+                            {
+                                error && !password && <div className='input-error'>Please enter password</div>
+                            }
+                            <p className="position-relative">
+                                <label>Confirm Password<span>*</span></label>
+                                <input
+                                    type={confirmPasswordType}
+                                    value={confirmPassword}
+                                    onChange={(e) => { setConfirmPassword(e.target.value) }}
+                                />
                                 {
-                                    error && !confirmPassword && <div className='input-error'>Please enter confirm password</div>
+                                    confirmPasswordType === 'password'
+                                        ?
+                                        <>
+                                            <button className="btn btn-vw" onClick={() => { setConfirmPasswordType("text") }}><i className="bi bi-eye-slash-fill"></i></button>
+                                        </>
+                                        :
+                                        <>
+                                            <button className="btn btn-vw" onClick={() => { setConfirmPasswordType("password") }}><i className="bi bi-eye-fill"></i></button>
+                                        </>
                                 }
-                                {
-                                    validPassword && !error && password && confirmPassword && <div className='input-error'>Password mismatch</div>
-                                }
-                                <div className="for-sign">
-                                    <label></label>
-                                    <button onClick={() => { handleSubmit() }}>Submit</button>
-                                </div>
+                            </p>
+                            {
+                                error && !confirmPassword && <div className='input-error'>Please enter confirm password</div>
+                            }
+                            {
+                                validPassword && !error && password && confirmPassword && <div className='input-error'>Password mismatch</div>
+                            }
+                            <div className="for-sign">
+                                <label></label>
+                                <button onClick={() => { handleSubmit() }}>Submit</button>
+                            </div>
 
                         </div>
                     </div>

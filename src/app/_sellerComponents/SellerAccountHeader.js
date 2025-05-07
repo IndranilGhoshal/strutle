@@ -1,8 +1,17 @@
 import Image from 'next/image'
 import React from 'react'
 import LogoutModal from './_modal/LogoutModal'
+import { removeLocalStorageData, setLocalStorageData, showLoader } from '../lib/common'
+import { useRouter } from 'next/navigation';
 
 export default function SellerAccountHeader() {
+    const router = useRouter();
+    const goto = (path) => {
+        showLoader()
+        router.push("/seller/account" + path)
+        removeLocalStorageData("pathName")
+        setLocalStorageData('pathName', path)
+    }
     return (
         <div className="top-new-nav">
             <strong>&nbsp;</strong>
@@ -142,13 +151,12 @@ export default function SellerAccountHeader() {
                             className={`dropdown-menu dropdown-menu-end`}
                             data-popper-placement="bottom-end"
                         >
-                            <a className="dropdown-item" ><svg xmlns="http://www.w3.org/2000/svg" width="24"
-                                height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-                                className="feather feather-user align-middle me-1">
-                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                                <circle cx="12" cy="7" r="4"></circle>
-                            </svg> Profile</a>
+                            <a className="dropdown-item" onClick={()=>{goto('/settings?tab=seller-details-tab')}} >
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" className="bi bi-gear me-1 my-2" viewBox="0 0 16 16">
+                                    <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492M5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0" />
+                                    <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115z" />
+                                </svg>
+                                Settings</a>
                             <a className="dropdown-item"><svg xmlns="http://www.w3.org/2000/svg" width="24"
                                 height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                 strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
@@ -157,7 +165,6 @@ export default function SellerAccountHeader() {
                                 <path d="M22 12A10 10 0 0 0 12 2v10z"></path>
                             </svg> Analytics</a>
                             <div className="dropdown-divider"></div>
-                            <a className="dropdown-item">Settings &amp; Privacy</a>
                             <a className="dropdown-item">Help</a>
                             <LogoutModal />
                         </div>

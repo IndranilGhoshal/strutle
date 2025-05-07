@@ -50,12 +50,12 @@ axios.interceptors.response.use(async (response) => {
         removeLocalStorageData("pathName")
         removeLocalStorageData("adminrole")
         removeLocalStorageData('col-key');
-        window.location.href = baseURL+"/admin?session=error";
+        window.location.href = baseURL + "/admin?session=error";
     }
     if (getLocalStorageData('seller')?._id && response.data.status == "401") {
         removeLocalStorageData("seller")
         removeLocalStorageData("pathName")
-        window.location.href = baseURL+"/seller?session=error";
+        window.location.href = baseURL + "/seller?session=error";
     }
     return response
 })
@@ -180,7 +180,7 @@ export const consumerloginapi = async (data) => {
 }
 
 export const consumercategoryapi = async (data) => {
-    return getPost(baseURL + '/api/consumer/category',data)
+    return getPost(baseURL + '/api/consumer/category', data)
 }
 
 export const consumeruserapi = async (data) => {
@@ -202,11 +202,11 @@ export const productapi = async (data) => {
 }
 
 export const menuapi = async (data) => {
-    return getPost(baseURL + '/api/consumer/menu',data)
+    return getPost(baseURL + '/api/consumer/menu', data)
 }
 
 export const cartapi = async (data) => {
-    return getPost(baseURL + '/api/consumer/cart',data)
+    return getPost(baseURL + '/api/consumer/cart', data)
 }
 
 export const pincodeapi = async (pincode) => {
@@ -265,5 +265,75 @@ export const sellerorderapi = async (data) => {
 export const sellershippingapi = async (data) => {
     let result
     await axios.post(baseURL + "/api/seller/shipping", data).then(res => { result = res.data })
+    return result
+}
+
+export const getgstapi = async (gstno) => {
+    // let result
+    // await axios.get("https://razorpay.com/api/gstin/"+gstno,{
+    // 	mode: 'no-cors',
+    // }).then(res => { result = res.data })
+    // return result
+    fetch("https://razorpay.com/api/gstin/" + gstno,
+        {
+            referrer: "https://razorpay.com/api/gstin/" + gstno,
+            credentials: 'include',
+            mode: 'no-cors',
+            referrerPolicy: "no-referrer-when-downgrade",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*",
+                "X-Aequseted-With": "XMLHttpRequest",
+            }
+        }).catch(err =>
+            console.log(err)
+        )
+        .then(function (response) {
+            console.log(response);
+        }).then(function (result) {
+            console.log(result)
+        });
+
+}
+export const getifscapi = async (data) => {
+    let result
+    await axios.get("https://ifsc.razorpay.com/" + data)
+        .then(res => {
+            result = res.data 
+        })
+        .catch(error => {
+            result = null
+        })
+    return result
+}
+
+
+export const sellersignupapi = async (data) => {
+    let result
+    await axios.post(baseURL + "/api/seller/signup", data).then(res => { result = res.data })
+    return result
+}
+
+export const sellerForgotPasswordApi = async (data) => {
+    let result
+    await axios.post(baseURL + "/api/seller/forgotpassword", data).then(res => { result = res.data })
+    return result
+}
+
+export const sellerResetPasswordApi = async (data) => {
+    let result
+    await axios.post(baseURL + "/api/seller/resetpassword", data).then(res => { result = res.data })
+    return result
+}
+
+export const sellerDashboardApi = async (data) => {
+    let result
+    await axios.post(baseURL + "/api/seller/dashboard", data).then(res => { result = res.data })
+    return result
+}
+
+export const sellerSettingsApi = async (data) => {
+    let result
+    await axios.post(baseURL + "/api/seller/settings", data).then(res => { result = res.data })
     return result
 }

@@ -1,9 +1,9 @@
 import mongoose from "mongoose";
 import { NextResponse } from "next/server";
 import { connectionStr } from "@/app/lib/db";
-import { adminSchema } from "@/app/model/adminModel";
 import ForgotPasswordEmailFunction from "../../_apiFunction/ForgotPasswordEmailFunction";
 import { StatusCodes } from "../../_apiFunction/StatusCode";
+import { sellersSchema } from "@/app/model/sellerModal";
 const { authEmail } = process.env
 
 export async function POST(request) {
@@ -14,9 +14,9 @@ export async function POST(request) {
         let message;
         let responsestatus;
         await mongoose.connect(connectionStr, { useNewUrlParser: true });
-        result = await adminSchema.findOne({ email: payload.email })
+        result = await sellersSchema.findOne({ email: payload.email })
         if (result) {
-            let forgortEmailResp = await ForgotPasswordEmailFunction({ id: result._id, from: authEmail, to: payload.email, name: result.firstname + " " + result.lastname, link:'/admin/resetPassword/' })
+            let forgortEmailResp = await ForgotPasswordEmailFunction({ id: result._id, from: authEmail, to: payload.email, name: result.name, link:'/seller/resetpassword/' })
             if (forgortEmailResp.success) {
                 success = true;
                 responsestatus = StatusCodes.SUCCESS

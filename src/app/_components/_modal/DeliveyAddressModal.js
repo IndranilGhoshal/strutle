@@ -6,7 +6,7 @@ import React, { useContext, useState } from 'react'
 import Modal from 'react-bootstrap/Modal';
 
 export default function DeliveyAddressModal({ setDeliveryAddress, setPincodeAddress, goto }) {
-    const { deliveryaddress, pincodeaddress } = useContext(AppContext);
+    const { deliveryaddress, pincodeaddress, username } = useContext(AppContext);
     const [show, setShow] = useState(false);
     const [list, setList] = useState([]);
 
@@ -58,9 +58,9 @@ export default function DeliveyAddressModal({ setDeliveryAddress, setPincodeAddr
             <div className="deliv-addrs cp" onClick={() => { checkuser() }}>
                 <i className="bi bi-geo-alt"></i>
                 <div className="deliv-addrs-txts">
-                    <strong>Delivery to {getLocalStorageData('consumer')?._id ? getLocalStorageData('consumer')?.firstname : <></>}</strong>
+                    <strong>Delivery to {username ? username: <></>}</strong>
                     {
-                        deliveryaddress ? <p>{deliveryaddress} {pincodeaddress}</p> : <p>Enter your location</p>
+                        deliveryaddress ? <p>{deliveryaddress+" "+pincodeaddress}</p> : <p>Enter your location</p>
                     }
                 </div>
             </div>

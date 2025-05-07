@@ -12,7 +12,7 @@ export async function POST(request) {
     let message;
     await mongoose.connect(connectionStr, { useNewUrlParser: true });
 
-    //send OTP Varify
+    //OTP Varify
     if (payload.otpsend) {
         let re = await otpSchema.findOne({ otp: payload.otp })
         if (re) {
@@ -100,7 +100,7 @@ export async function POST(request) {
                 let up = await otpSchema.findOneAndUpdate({ _id: r._id }, { status: "1" })
                 if (i === re.length - 1) {
                     let otp = generateOtp({ len: "6", nums: true })
-                    let getotp = await otpsend('OTP resend your Login - ' + otp + '. From Strule Teams', "+12727700953", "+91" + payload.phone)
+                    let getotp = await otpsend('OTP resend your Login - ' + otp + '. From Srutle Teams', "+12727700953", "+91" + payload.phone)
                     if (getotp) {
                         let data = {
                             phone: payload.phone,
@@ -146,10 +146,11 @@ export async function POST(request) {
         }
     }
 
+    //OTP Send
     else {
         let FIVE_MINUTES = new Date().getTime() + 300000;
         let otp = generateOtp({ len: "6", nums: true })
-        let getotp = await otpsend('OTP for your Login - ' + otp + '. From Strule Teams', "+12727700953", "+91" + payload.phone)
+        let getotp = await otpsend('OTP for your Login - ' + otp + '. From Srutle Teams', "+12727700953", "+91" + payload.phone)
         if (getotp) {
             let data = {
                 phone: payload.phone,
@@ -171,5 +172,6 @@ export async function POST(request) {
             message = "OTP send Faild"
         }
     }
+    
     return NextResponse.json({ result, success, message })
 }

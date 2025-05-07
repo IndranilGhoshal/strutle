@@ -16,6 +16,7 @@ export default function layout({ children }) {
   const [cartCount, setCartCount] = useState(0);
   const [deliveryaddress, setDeliveryAddress] = useState('');
   const [pincodeaddress, setPincodeAddress] = useState('');
+  const [username, setusername] = useState('');
 
   const { isOnline } = useNetworkStatus();
 
@@ -34,11 +35,8 @@ export default function layout({ children }) {
       getcartdata()
       getdeliverydata()
       setUserImage(user.image)
+      setusername(user.firstname)
     }
-    // let bodyelem = document.getElementById('body')
-    // bodyelem.classList.remove("seller");
-    // bodyelem.classList.remove("body-slide");
-    //     bodyelem.classList.remove("body-pd");
   }, [])
 
   const getcartdata = async () => {
@@ -71,7 +69,19 @@ export default function layout({ children }) {
     <>
       {
         isOnline ?
-          <AppContext.Provider value={{ userImage, setUserImage, cartCount, setCartCount, deliveryaddress, setDeliveryAddress, pincodeaddress, setPincodeAddress }}>
+          <AppContext.Provider 
+          value={{ 
+            userImage, 
+            setUserImage, 
+            cartCount, 
+            setCartCount, 
+            deliveryaddress, 
+            setDeliveryAddress, 
+            pincodeaddress, 
+            setPincodeAddress, 
+            username,
+            setusername
+            }}>
             <HeaderComponent />
             <div id="consumerid" className="main">
               {children}

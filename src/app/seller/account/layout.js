@@ -18,10 +18,6 @@ export default function Layout({ children }) {
         { menuName: "Transaction", menuIcon: "bi-arrow-left-right", menuUrl: "/transaction", submenu: [] },
     ])
     useEffect(() => {
-        // let elem = document.getElementById('body')
-        // elem.classList.add("seller");
-        // elem.classList.remove("body-slide");
-        // elem.classList.remove("body-pd");
         let getPath = getLocalStorageData('pathName')
         if (getPath) {
             router.push("/seller/account" + getPath)

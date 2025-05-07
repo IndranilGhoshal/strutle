@@ -22,9 +22,9 @@ export default function ForgortPasswordComponent() {
 
 
     useEffect(() => {
-        if (getLocalStorageData("admin") === null) {
+        if (!getLocalStorageData("admin")) {
             router.push("/admin/forgotpassword");
-            if(getPassData()){
+            if (getPassData()) {
                 toast.error(getPassData())
             }
             hideLoader()
@@ -128,7 +128,10 @@ export default function ForgortPasswordComponent() {
                     </>
                     :
                     <>
-                        <div className='send-email'>      
+                        <div className='send-email'>
+                            <div className='send-email-sceess my-4'>
+                                <Image className='log-logo-img m-auto' src={"/assets/seller-img/srutle-logo.png"} width={350} height={100} alt='login' />
+                            </div>
                             <div className='send-email-sceess'>
                                 <Image
                                     src={"/assets/img/emailsend.png"}
@@ -149,7 +152,7 @@ export default function ForgortPasswordComponent() {
                                 </div>
                             </div>
                             <div className='send-email-sceess'>
-                                <button className="btn down_btn mx-auto" onClick={()=>{goto("/admin")}}>Back to Login</button>
+                                <button className="btn down_btn mx-auto" onClick={() => { goto("/admin") }}>Back to Login</button>
                             </div>
                         </div>
                     </>

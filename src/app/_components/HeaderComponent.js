@@ -12,7 +12,7 @@ import AutocompleteSearch from './AutocompleteSearch'
 import DeliveyAddressModal from './_modal/DeliveyAddressModal'
 
 export default function HeaderComponent() {
-    const { userImage, cartCount, setDeliveryAddress, setPincodeAddress } = useContext(AppContext);
+    const { userImage, cartCount, setDeliveryAddress, setPincodeAddress, setusername, setCartCount } = useContext(AppContext);
     const [user, setUser] = useState({})
     const [menulist, setMenuList] = useState([])
 
@@ -66,9 +66,10 @@ export default function HeaderComponent() {
         removeLocalStorageData("consumer")
         removeLocalStorageData("pathName")
         router.push("/consumer")
-        cartCount('0')
+        setCartCount('0')
         setDeliveryAddress('')
         setPincodeAddress('')
+        setusername('')
         toast.success("User logout successfully!")
         hideLoader()
     }

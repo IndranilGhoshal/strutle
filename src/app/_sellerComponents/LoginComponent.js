@@ -22,7 +22,7 @@ export default function LoginComponent() {
 
 
     useEffect(() => {
-        if (getLocalStorageData('admin')?.id) {
+        if (getLocalStorageData('seller')?._id) {
             router.push("/seller/account");
         } else {
             if (search == "error") {
@@ -56,15 +56,22 @@ export default function LoginComponent() {
             let response = await sellerloginapi(data)
             if (response.success) {
                 const { result } = response;
-                removeLocalStorageData("pathName")
                 setLocalStorageData("seller", result)
-                router.push("/seller/account");
+                removeLocalStorageData("pathName")
+                router.push("/seller/account")
                 setPassData(response.message)
             } else {
                 hideLoader()
                 toast.error(response.message)
             }
         }
+    }
+
+    const goto = (path) => {
+        showLoader()
+        router.push("/seller" + path)
+        removeLocalStorageData("pathName")
+        setLocalStorageData('pathName', path)
     }
 
     return (
@@ -128,7 +135,7 @@ export default function LoginComponent() {
                                 </div>
                             </div>
                             <div className="register-link">
-                                Don't have an account? <a href="seller-signup.html">Register as seller <i className="bi bi-arrow-right-short"></i> </a>
+                                Don't have an account? <a className='text-blue' onClick={() => { goto('/signup') }}>Register as seller </a>
                             </div>
                         </div>
                     </div>

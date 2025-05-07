@@ -8,7 +8,7 @@ import { Modal } from 'react-bootstrap';
 import OtpInput from "react-otp-input";
 
 export default function LoginModal({ onMessage, setUser }) {
-    const { setUserImage, setCartCount, setDeliveryAddress, setPincodeAddress } = useContext(AppContext);
+    const { setUserImage, setCartCount, setDeliveryAddress, setPincodeAddress, setusername } = useContext(AppContext);
     useEffect(() => {
         clearTimer(getDeadTime());
     }, [])
@@ -127,6 +127,7 @@ export default function LoginModal({ onMessage, setUser }) {
                 const { result } = response;
                 delete result.password;
                 setUserImage(result.image)
+                setusername(result.firstname)
                 setLocalStorageData("consumer", result)
                 setUser(result)
                 setotpdiv(true)

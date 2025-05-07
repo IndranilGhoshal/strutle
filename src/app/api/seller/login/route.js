@@ -33,7 +33,9 @@ export async function POST(request) {
                         "name": results.name,
                         "email": results.email,
                         "phone": results.phone,
-                        "esignature":results.phone,
+                        "esignature":results.esignature,
+                        "esignaturetype":results.esignaturetype,
+                        "islogin":results.islogin,
                         "token": token,
                     }
                     result = obj

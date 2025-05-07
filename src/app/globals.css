@@ -647,3 +647,104 @@ button.btn.down_btn.atc-btn {
     font-weight: 700;
     margin-right: 10px;
 }
+
+.sett-sign-box {
+    border: 1px solid lightgray;
+    margin-top: 30px;
+    /* padding: 10px; */
+    width: 60%;
+    border-radius: 10px;
+}
+
+.sett-sign-box-t {
+    background: #F8F8F8;
+    padding: 10px;
+    border-radius: 10px 10px 0 0;
+}
+
+.sett-sign-box-t p {
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.sett-sign-box-t h5 {
+    font-size: 34px;
+    font-weight: 500;
+    font-family: Cursive;
+}
+
+.sett-sign-box-b {
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.sett-sign-box-b p{
+    padding: 0;
+    margin: 0;
+    font-size: 14px;
+}
+
+.sett-sign-box-btn button{
+    color: #fff;
+    background-color: #0B369E;
+}
+
+.conv-sign {
+    padding: 20px;
+    font-size: 30px;
+    text-align: center;
+    background: lightgray;
+    font-weight: 100;
+    font-family: Cursive;
+    border-radius: 10px;
+}
+
+.conv-sign-btn button{
+    color: #fff;
+    background-color: #0B369E;
+    width: 100%;
+}
+
+.conv-sign-upload{
+    padding: 20px;
+    font-size: 24px;
+    text-align: center;
+    background: #F8F8F8;
+    font-weight: 100;
+    border-radius: 10px;
+    border-style: dotted;
+    border: 1px solid #0B369E;
+    color: #0B369E;
+}
+
+.e-Sign-p{
+    font-size: 14px;
+    color: gray;
+}
+
+.conv-sign-dv img {
+    padding-top: 10px;
+    padding-bottom: 20px;
+}
+
+.change-password input {
+    padding: 5px !important;
+}
+
+.change-password {
+    width: 60% !important;
+}
+
+.whatsapp-notification{
+    display: flex;
+}
+
+.whatsapp-notification label{
+    display: flex;
+}
+
+.whatsapp-notification label img{
+    margin-left: 5px;
+    margin-right: 5px;
+}
