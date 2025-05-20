@@ -1,0 +1,54 @@
+.loader-new {
+    background: rgba(250,250,250,.8);
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+    .loader-new svg {
+      font-family: "Nunito", sans-serif;
+      font-weight: 900;
+      position: absolute;
+      width: 100%;
+      height: 100%;
+    }
+
+    .loader-new svg text {
+      text-transform: uppercase;
+      animation: stroke 5s infinite alternate;
+      stroke-width: 2;
+      stroke: #0B369E;
+      font-size: 140px;
+    }
+
+    @keyframes stroke {
+      0% {
+        fill: rgba(72, 138, 20, 0);
+        stroke: rgba(21, 5, 167, 1);
+        stroke-dashoffset: 25%;
+        stroke-dasharray: 0 50%;
+        stroke-width: 2;
+      }
+
+      70% {
+        fill: rgba(72, 138, 20, 0);
+        stroke: rgba(21, 5, 167, 1);
+      }
+
+      80% {
+        fill: rgba(72, 138, 20, 0);
+        stroke: rgba(21, 5, 167, 1);
+        stroke-width: 3;
+      }
+
+      100% {
+        fill: rgba(21, 5, 167, 1);
+        stroke: rgba(54, 95, 160, 0);
+        stroke-dashoffset: -25%;
+        stroke-dasharray: 50% 0;
+        stroke-width: 0;
+      }
+    }
